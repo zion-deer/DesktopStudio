@@ -37,11 +37,17 @@ The app is sandboxed and uses the user-selected file entitlement for import and 
 ## Requirements
 
 - macOS 14 or later
-- Xcode 15 or later, with the macOS 14 SDK
+- Xcode 15 or later (Xcode 27 tested), with the macOS 14 SDK
 
 SwiftUI and AppKit are Apple platforms. This repository cannot be compiled on Linux.
 
 ## Open and build
+
+Clone the repo (for example with [Origin](https://cursor.com/docs/cli/overview)) and work from the folder that contains `DesktopStudio.xcodeproj`:
+
+```bash
+cd ~/DesktopStudio
+```
 
 Open `DesktopStudio.xcodeproj` and run the **Desktop Studio** scheme.
 
@@ -56,6 +62,33 @@ If automatic signing fails because no development team is selected, build locall
 ```bash
 xcodebuild -project DesktopStudio.xcodeproj -scheme DesktopStudio -destination 'platform=macOS' -configuration Debug CODE_SIGNING_ALLOWED=NO build
 ```
+
+### Xcode 27 and “not a valid property list”
+
+If `xcodebuild` reports that the project is not a valid property list (often with a JSON parse error), the usual causes are a stale clone or a damaged `project.pbxproj`. Pull the latest `main`, then check the project file:
+
+```bash
+cd ~/DesktopStudio
+origin repo pull   # or git pull
+file DesktopStudio.xcodeproj/project.pbxproj   # should say "ASCII text"
+wc -c DesktopStudio.xcodeproj/project.pbxproj  # about 40000 bytes
+head -1 DesktopStudio.xcodeproj/project.pbxproj # // !$*UTF8*$!
+```
+
+Ensure the active developer directory is the full Xcode app (not Command Line Tools only):
+
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+xcodebuild -version
+```
+
+List schemes to confirm the project loads:
+
+```bash
+xcodebuild -list -project DesktopStudio.xcodeproj
+```
+
+In Xcode 27, you can also select the project in the navigator, open the File inspector, and leave **Project Format** on the property list format unless you intentionally migrate to JSON.
 
 Run the unit tests:
 

@@ -1,0 +1,5 @@
+# Keep Xcode project files stable across macOS and Linux checkouts.
+*.pbxproj text eol=lf
+*.xcscheme text eol=lf
+*.xcworkspacedata text eol=lf
+*.xcproj text eol=lf
