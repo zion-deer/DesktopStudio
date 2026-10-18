@@ -9,7 +9,15 @@ struct RuntimeDisplay: Equatable, Identifiable {
     var isMain: Bool
 }
 
-/// Where a theme canvas is drawn inside one display's visible area.
+/// Which part of a display the theme covers.
+enum CanvasPlacementArea: Equatable {
+    /// The area beside the menu bar and system Dock.
+    case visibleFrame
+    /// The whole display, including the menu bar and Dock strips.
+    case fullFrame
+}
+
+/// Where a theme canvas is drawn inside one display.
 struct FittedCanvas: Equatable {
     var displayID: UInt32
     var scale: Double
@@ -18,10 +26,14 @@ struct FittedCanvas: Equatable {
 
 /// Converts theme canvas coordinates (top-left origin) to AppKit window frames.
 enum CanvasScreenMapping {
-    /// Aspect-fits the canvas inside the display's visible frame and centers it.
-    /// The menu bar and Dock stay outside `visibleFrame`, so widgets are not placed on top of them.
-    static func fit(canvasWidth: Double, canvasHeight: Double, display: RuntimeDisplay) -> FittedCanvas? {
-        let visible = display.visibleFrame
+    /// Aspect-fits the canvas inside the chosen display area and centers it.
+    static func fit(
+        canvasWidth: Double,
+        canvasHeight: Double,
+        display: RuntimeDisplay,
+        area: CanvasPlacementArea = .visibleFrame
+    ) -> FittedCanvas? {
+        let visible = area == .fullFrame ? display.frame : display.visibleFrame
         guard canvasWidth > 0, canvasHeight > 0, visible.width > 1, visible.height > 1 else { return nil }
         let scale = min(visible.width / canvasWidth, visible.height / canvasHeight)
         guard scale.isFinite, scale > 0 else { return nil }

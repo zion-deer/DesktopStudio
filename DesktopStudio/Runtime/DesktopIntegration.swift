@@ -2,8 +2,8 @@ import Foundation
 
 /// Result of asking the desktop runtime to show or hide theme windows.
 ///
-/// `applied` is true only when this app opened or closed its own widget windows.
-/// It does not mean the Dock, menu bar, Finder, wallpaper, or system files changed.
+/// `applied` is true when this app opened or closed its own windows.
+/// An active experience also covers the desktop. Stop puts the Dock and menu bar back.
 struct DesktopApplyReport: Equatable {
     var applied: Bool
     var title: String

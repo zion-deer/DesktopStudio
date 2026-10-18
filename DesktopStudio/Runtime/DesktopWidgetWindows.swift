@@ -41,6 +41,9 @@ final class AppKitWidgetSurface: NSObject, DesktopWidgetSurface, NSWindowDelegat
             },
             onDismissLauncher: { [weak controller] in
                 controller?.hideLauncher()
+            },
+            onStop: { [weak controller] in
+                _ = controller?.stopExperience()
             }
         )
         let hosting = NSHostingView(rootView: root)
@@ -86,6 +89,14 @@ final class AppKitWidgetSurface: NSObject, DesktopWidgetSurface, NSWindowDelegat
         model.status = message
     }
 
+    func setLayer(_ layer: DesktopWindowLayer) {
+        if layer == .aboveApplications, model.component.type == .dock {
+            panel.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.dockWindow)) + 1)
+        } else {
+            panel.level = layer.windowLevel
+        }
+    }
+
     func setLauncherShown(_ shown: Bool) {
         guard model.component.type == .launcher else { return }
         if shown {
@@ -129,9 +140,7 @@ private final class WidgetPanel: NSPanel {
             defer: false
         )
         isFloatingPanel = true
-        // Above normal windows so a widget stays visible, but not a full-screen shield.
-        // Clicks outside the widget still reach the window underneath.
-        level = .floating
+        level = DesktopWindowLayer.aboveSystemChrome.windowLevel
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         hidesOnDeactivate = false
         becomesKeyOnlyIfNeeded = true

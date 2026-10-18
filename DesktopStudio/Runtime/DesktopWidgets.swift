@@ -19,6 +19,7 @@ struct DesktopWidgetView: View {
     var onOpenApp: (String) -> Void
     var onOpenLauncher: () -> Void = {}
     var onDismissLauncher: () -> Void = {}
+    var onStop: () -> Void = {}
 
     var body: some View {
         if model.component.type == .dock {
@@ -27,7 +28,8 @@ struct DesktopWidgetView: View {
             LauncherWidgetView(
                 model: model,
                 onLaunch: onOpenApp,
-                onDismiss: onDismissLauncher
+                onDismiss: onDismissLauncher,
+                onStop: onStop
             )
         } else {
             standardBody
@@ -64,11 +66,14 @@ struct DesktopWidgetView: View {
         )
         .opacity(appearance.opacity)
         .shadow(color: appearance.shadowEnabled ? .black.opacity(0.28) : .clear, radius: appearance.shadowEnabled ? 16 : 0, y: 8)
+        .contextMenu {
+            Button("Stop Desktop Experience") { onStop() }
+        }
     }
 
     private var dockBody: some View {
         let appearance = model.component.resolvedAppearance(in: model.theme)
-        return DockWidgetBody(model: model, appearance: appearance, onCommit: onCommit, onOpenApp: onOpenApp, onOpenLauncher: onOpenLauncher)
+        return DockWidgetBody(model: model, appearance: appearance, onCommit: onCommit, onOpenApp: onOpenApp, onOpenLauncher: onOpenLauncher, onStop: onStop)
             .padding(model.component.settings.dockPadding)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .foregroundStyle(appearance.foreground.color)
@@ -109,6 +114,7 @@ private struct DockWidgetBody: View {
     var onCommit: (ComponentSettings) -> Void
     var onOpenApp: (String) -> Void
     var onOpenLauncher: () -> Void
+    var onStop: () -> Void
     @State private var hoveredItemID: UUID?
 
     private var items: [DockItem] {
@@ -160,6 +166,7 @@ private struct DockWidgetBody: View {
                 settings.launchAtLogin.toggle()
                 onCommit(settings)
             }
+            Button("Stop Desktop Experience") { onStop() }
         }
     }
 
@@ -285,6 +292,8 @@ private struct ClockWidgetBody: View {
                 settings.showsSeconds.toggle()
                 onCommit(settings)
             }
+            Divider()
+            Button("Stop Desktop Experience") { onStop() }
         }
         .accessibilityLabel("Clock")
     }

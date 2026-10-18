@@ -28,7 +28,29 @@ protocol DesktopWidgetSurface: AnyObject {
     func setVisible(_ visible: Bool)
     func setStatus(_ message: String?)
     func setLauncherShown(_ shown: Bool)
+    func setLayer(_ layer: DesktopWindowLayer)
     func close()
+}
+
+extension DesktopWidgetSurface {
+    func setLayer(_ layer: DesktopWindowLayer) {}
+}
+
+/// Covers the wallpaper and desktop icons, and can also cover the Dock and menu bar.
+@MainActor
+protocol DesktopBackdropInstalling: AnyObject {
+    func show(theme: Theme, displays: [RuntimeDisplay])
+    func revealApplications()
+    func hide()
+    var isCoveringTheScreen: Bool { get }
+}
+
+/// Hides the Dock and menu bar while a theme is the desktop, then restores them.
+@MainActor
+protocol SystemChromeHiding: AnyObject {
+    func hideChrome()
+    func restoreChrome()
+    var isHidden: Bool { get }
 }
 
 @MainActor
@@ -43,7 +65,8 @@ protocol DesktopSurfaceInstalling: AnyObject {
 
 /// Loads a validated theme and shows clock, text, notes, app-shortcut, and custom dock windows.
 ///
-/// The custom dock is a Desktop Studio window. It does not hide, move, or replace the system Dock.
+/// Apply covers the desktop with the theme and hides the Dock and menu bar.
+/// Stop closes those windows and puts the system chrome back.
 @MainActor
 final class DesktopRuntimeController: DesktopIntegrating {
     static let supportedTypes: Set<ComponentType> = [.clock, .text, .notes, .appShortcut, .dock, .launcher]
@@ -54,6 +77,8 @@ final class DesktopRuntimeController: DesktopIntegrating {
     private let surfaces: any DesktopSurfaceInstalling
     private let loginItems: any LoginItemRegistering
     private let appLauncher: any ApplicationLaunching
+    private let backdrop: any DesktopBackdropInstalling
+    private let chrome: any SystemChromeHiding
     weak var layoutSink: RuntimeLayoutSink?
 
     private var session: DesktopExperienceSession?
@@ -71,7 +96,9 @@ final class DesktopRuntimeController: DesktopIntegrating {
         screens: any ScreenProviding,
         surfaces: any DesktopSurfaceInstalling,
         loginItems: any LoginItemRegistering = DisabledLoginItems(),
-        appLauncher: any ApplicationLaunching = WorkspaceApplicationLauncher()
+        appLauncher: any ApplicationLaunching = WorkspaceApplicationLauncher(),
+        backdrop: any DesktopBackdropInstalling = NoDesktopBackdrop(),
+        chrome: any SystemChromeHiding = NoSystemChrome()
     ) {
         self.themeStore = themeStore
         self.sessionStore = sessionStore
@@ -79,6 +106,8 @@ final class DesktopRuntimeController: DesktopIntegrating {
         self.surfaces = surfaces
         self.loginItems = loginItems
         self.appLauncher = appLauncher
+        self.backdrop = backdrop
+        self.chrome = chrome
         self.session = sessionStore.load()
     }
 
@@ -96,7 +125,9 @@ final class DesktopRuntimeController: DesktopIntegrating {
             screens: AppKitScreenProvider(),
             surfaces: AppKitDesktopSurfaceFactory(),
             loginItems: SystemLoginItemRegistration(),
-            appLauncher: WorkspaceApplicationLauncher()
+            appLauncher: WorkspaceApplicationLauncher(),
+            backdrop: AppKitDesktopBackdrop(),
+            chrome: AppKitSystemChrome()
         )
         controller.installSystemObservers()
         return controller
@@ -183,10 +214,11 @@ final class DesktopRuntimeController: DesktopIntegrating {
             return DesktopApplyReport(
                 applied: false,
                 title: "Desktop experience is stopped",
-                message: "No Desktop Studio windows are open. The Dock, menu bar, Finder, wallpaper, and system files were not changed."
+                message: "No Desktop Studio windows are open. The Dock and menu bar are visible."
             )
         }
         closeSurfaces()
+        dismissShell()
         session.active = false
         self.session = session
         appliedTheme = nil
@@ -194,13 +226,14 @@ final class DesktopRuntimeController: DesktopIntegrating {
         return DesktopApplyReport(
             applied: true,
             title: "Desktop experience stopped",
-            message: "Widget windows were closed. Positions already saved in the theme were kept. Restore Default Experience puts widget content back to the moment you chose Apply. The macOS Dock, menu bar, Finder, wallpaper, and system files were not changed."
+            message: "The theme was closed and the Dock and menu bar are visible again. Positions already saved in the theme were kept."
         )
     }
 
     func restoreDefaultExperience() -> DesktopApplyReport {
         guard let session else {
             closeSurfaces()
+            dismissShell()
             appliedTheme = nil
             return DesktopApplyReport(
                 applied: false,
@@ -210,6 +243,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
         }
         let baseline = session.baseline
         closeSurfaces()
+        dismissShell()
         appliedTheme = nil
         self.session = nil
         sessionStore.clear()
@@ -223,7 +257,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
         return DesktopApplyReport(
             applied: true,
             title: "Default desktop restored",
-            message: "\(saveNote) Desktop Studio did not change the Dock, menu bar, Finder, wallpaper, or system files."
+            message: "\(saveNote) The Dock and menu bar are visible again."
         )
     }
 
@@ -335,7 +369,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
                 placement.displayID = display.id
             }
             guard let component = theme.components.first(where: { $0.id == placement.componentID }),
-                  let fitted = CanvasScreenMapping.fit(canvasWidth: theme.canvas.width, canvasHeight: theme.canvas.height, display: display)
+                  let fitted = fittedCanvas(theme, on: display)
             else { continue }
             placement.frame = component.frame
             session.placements[index] = placement
@@ -344,6 +378,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
         }
         self.session = session
         sessionStore.save(session)
+        backdrop.show(theme: theme, displays: displays)
         orderSurfaces(for: theme)
     }
 
@@ -353,11 +388,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
         let displays = screens.screens()
         let center = CGPoint(x: windowFrame.midX, y: windowFrame.midY)
         guard let display = CanvasScreenMapping.display(containing: center, displays: displays),
-              let fitted = CanvasScreenMapping.fit(
-                canvasWidth: theme.canvas.width,
-                canvasHeight: theme.canvas.height,
-                display: display
-              )
+              let fitted = fittedCanvas(theme, on: display)
         else { return }
 
         let position = CanvasScreenMapping.canvasPosition(windowFrame: windowFrame, fitted: fitted)
@@ -385,11 +416,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
         appliedTheme = theme
         self.session = session
         sessionStore.save(session)
-        if let refitted = CanvasScreenMapping.fit(
-            canvasWidth: theme.canvas.width,
-            canvasHeight: theme.canvas.height,
-            display: display
-        ) {
+        if let refitted = fittedCanvas(theme, on: display) {
             surfaceByID[componentID]?.place(
                 windowFrame: CanvasScreenMapping.windowFrame(component: frame, fitted: refitted)
             )
@@ -438,6 +465,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
             return
         }
         surfaceByID[componentID]?.setStatus(nil)
+        revealApplications()
         appLauncher.openApplication(at: url) { [weak self] error in
             Task { @MainActor in
                 self?.surfaceByID[componentID]?.setStatus(error)
@@ -508,11 +536,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
         for component in ordered where Self.supportedTypes.contains(component.type) {
             let requested = placements.first(where: { $0.componentID == component.id })?.displayID
             let display = displays.first(where: { $0.id == requested }) ?? fallback
-            guard let fitted = CanvasScreenMapping.fit(
-                canvasWidth: theme.canvas.width,
-                canvasHeight: theme.canvas.height,
-                display: display
-            ) else { continue }
+            guard let fitted = fittedCanvas(theme, on: display) else { continue }
             let frame = component.frame.clamped(to: theme.canvas)
             let window = CanvasScreenMapping.windowFrame(component: frame, fitted: fitted)
             var shown = component
@@ -530,6 +554,8 @@ final class DesktopRuntimeController: DesktopIntegrating {
             )
         }
 
+        chrome.hideChrome()
+        backdrop.show(theme: theme, displays: displays)
         orderSurfaces(for: theme)
         appliedTheme = theme
         let stored = DesktopExperienceSession(
@@ -547,7 +573,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
             let names = skipped.map(\.type.libraryTitle).joined(separator: ", ")
             message += " Skipped \(skipped.count) (\(names))."
         }
-        message += " Drag a widget to save its canvas position. The custom dock launches pinned apps and does not replace the system Dock. Open the launcher from the dock or its shortcut. Clock, text, and notes can be edited on the widget. Stop Desktop Experience closes these windows. The menu bar, Finder, wallpaper, and system files were not changed."
+        message += " The theme covers the wallpaper, desktop icons, Dock, and menu bar. Open an app from the custom dock to use that app. Right-click a widget and choose Stop Desktop Experience to bring the Mac desktop back."
         syncLoginItem(for: theme)
         installLauncherHotkey(for: theme)
         for component in theme.components where component.type == .launcher {
@@ -618,14 +644,17 @@ final class DesktopRuntimeController: DesktopIntegrating {
         let displays = screens.screens()
         let displayID = session?.placements.first(where: { $0.componentID == componentID })?.displayID
         let display = displays.first(where: { $0.id == displayID }) ?? preferredDisplay(in: displays)
-        guard let display,
-              let fitted = CanvasScreenMapping.fit(
-                canvasWidth: theme.canvas.width,
-                canvasHeight: theme.canvas.height,
-                display: display
-              )
-        else { return }
+        guard let display, let fitted = fittedCanvas(theme, on: display) else { return }
         surfaceByID[componentID]?.place(windowFrame: CanvasScreenMapping.windowFrame(component: frame, fitted: fitted))
+    }
+
+    private func fittedCanvas(_ theme: Theme, on display: RuntimeDisplay) -> FittedCanvas? {
+        CanvasScreenMapping.fit(
+            canvasWidth: theme.canvas.width,
+            canvasHeight: theme.canvas.height,
+            display: display,
+            area: .fullFrame
+        )
     }
 
     private func syncLoginItem(for theme: Theme) {
@@ -701,6 +730,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
 
     private func deactivatePersistedSession() {
         closeSurfaces()
+        dismissShell()
         appliedTheme = nil
         if var session {
             session.active = false
@@ -714,6 +744,7 @@ final class DesktopRuntimeController: DesktopIntegrating {
     }
 
     private func orderSurfaces(for theme: Theme) {
+        let layer: DesktopWindowLayer = backdrop.isCoveringTheScreen ? .aboveSystemChrome : .aboveApplications
         let ordered = theme.components.sorted { lhs, rhs in
             if lhs.frame.zIndex == rhs.frame.zIndex {
                 return lhs.id.uuidString < rhs.id.uuidString
@@ -721,8 +752,20 @@ final class DesktopRuntimeController: DesktopIntegrating {
             return lhs.frame.zIndex < rhs.frame.zIndex
         }
         for component in ordered {
+            surfaceByID[component.id]?.setLayer(layer)
             surfaceByID[component.id]?.orderFront()
         }
+    }
+
+    private func revealApplications() {
+        backdrop.revealApplications()
+        guard let theme = appliedTheme else { return }
+        orderSurfaces(for: theme)
+    }
+
+    private func dismissShell() {
+        backdrop.hide()
+        chrome.restoreChrome()
     }
 
     private func closeSurfaces() {

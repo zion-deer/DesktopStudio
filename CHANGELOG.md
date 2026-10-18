@@ -1,9 +1,14 @@
 # Changelog
 
-Semantic versions follow the `MARKETING_VERSION` build setting. The build number is `CURRENT_PROJECT_VERSION`. This project is at 0.1.0.
+Semantic versions follow the `MARKETING_VERSION` build setting. The build number is `CURRENT_PROJECT_VERSION`. This project is at 0.2.2 (build 4).
 
 ## [Unreleased]
 
+- Apply covers the wallpaper, desktop icons, Dock, and menu bar with the theme. Stop Desktop Experience, from a widget’s menu, puts the Mac desktop back.
+
+## [0.2.1] - 2026-10-18
+
+- First published beta. Locally signed zip on GitHub Releases. Sparkle feed is the Pages appcast.
 - Desktop runtime that opens one native window per clock, text, notes, app-shortcut, and custom dock component.
 - Custom dock with pinned apps, bundle identifiers, icon size, spacing, padding, alignment, and screen edge. Appearance still controls background, opacity, and corner radius. Hover scales an icon. Tab and Space or Return launch it. Choose Application stores a bundle identifier from the system file picker and does not store a path. Missing apps stay visible but do not launch.
 - Optional Desktop Studio login item through `SMAppService`. macOS may require approval in System Settings. The system Dock is never modified.
@@ -13,7 +18,7 @@ Semantic versions follow the `MARKETING_VERSION` build setting. The build number
 - Clock widgets format the time and can switch 12-hour, 24-hour, or system time, with optional date and seconds. Text and notes can be edited on the widget. App shortcuts open an installed app through `NSWorkspace`.
 - Display changes and wake re-place widgets. A missing display moves that widget onto the main display, still using its canvas position. An active session is restored after the app launches again.
 - Stop Desktop Experience closes widget windows and leaves saved theme content in place. Restore Default Experience closes them and writes back the theme snapshot from the moment Apply was chosen. Stop does not remove a login item.
-- The macOS Dock, menu bar, Finder, wallpaper, and system files are not modified. No Accessibility, Screen Recording, or Apple Events permission is requested.
+- Apply hides the Dock and menu bar and covers the wallpaper and desktop icons. Stop puts them back. No Accessibility, Screen Recording, or Apple Events permission is requested.
 - Sparkle 2.10 checks a signed appcast for published releases. A local build leaves the feed empty and does not check. Themes stay in Application Support when an update replaces the app.
 - GitHub Actions keeps build-and-test separate from the release workflow. Only a version tag, or a manual run of that workflow, can publish a Developer ID archive.
 

@@ -9,6 +9,7 @@ struct LauncherWidgetView: View {
     @ObservedObject var model: WidgetModel
     var onLaunch: (String) -> Void
     var onDismiss: () -> Void
+    var onStop: () -> Void = {}
     @State private var query = ""
     @State private var selection = 0
     @State private var applications: [InstalledApplication] = []
@@ -36,6 +37,7 @@ struct LauncherWidgetView: View {
                 Button("Close") { onDismiss() }
                     .keyboardShortcut(.cancelAction)
                     .accessibilityLabel("Close launcher")
+                Button("Stop Desktop Experience") { onStop() }
             }
             TextField("Search applications", text: $query)
                 .textFieldStyle(.roundedBorder)

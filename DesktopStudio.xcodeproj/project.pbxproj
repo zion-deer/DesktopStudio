@@ -66,6 +66,7 @@
 		F3B100000000000000000002 /* DesktopExperienceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000002 /* DesktopExperienceSession.swift */; };
 		F3B100000000000000000003 /* DesktopRuntimeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000003 /* DesktopRuntimeController.swift */; };
 		F3B100000000000000000004 /* DesktopWidgetWindows.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000004 /* DesktopWidgetWindows.swift */; };
+		F3B100000000000000000012 /* DesktopShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000012 /* DesktopShell.swift */; };
 		F3B100000000000000000005 /* DesktopWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000005 /* DesktopWidgets.swift */; };
 		F3B100000000000000000007 /* DesktopRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000007 /* DesktopRuntimeTests.swift */; };
 		F3B100000000000000000008 /* DockLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000008 /* DockLayout.swift */; };
@@ -156,6 +157,7 @@
 		F3A100000000000000000002 /* DesktopExperienceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopExperienceSession.swift; sourceTree = "<group>"; };
 		F3A100000000000000000003 /* DesktopRuntimeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopRuntimeController.swift; sourceTree = "<group>"; };
 		F3A100000000000000000004 /* DesktopWidgetWindows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopWidgetWindows.swift; sourceTree = "<group>"; };
+		F3A100000000000000000012 /* DesktopShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopShell.swift; sourceTree = "<group>"; };
 		F3A100000000000000000005 /* DesktopWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopWidgets.swift; sourceTree = "<group>"; };
 		F3A100000000000000000007 /* DesktopRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopRuntimeTests.swift; sourceTree = "<group>"; };
 		F3A100000000000000000008 /* DockLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockLayout.swift; sourceTree = "<group>"; };
@@ -393,6 +395,7 @@
 				F3A100000000000000000002 /* DesktopExperienceSession.swift */,
 				F3A100000000000000000003 /* DesktopRuntimeController.swift */,
 				F3A100000000000000000004 /* DesktopWidgetWindows.swift */,
+				F3A100000000000000000012 /* DesktopShell.swift */,
 				F3A100000000000000000005 /* DesktopWidgets.swift */,
 				F3A100000000000000000008 /* DockLayout.swift */,
 				F3A100000000000000000009 /* DockAppPicker.swift */,
@@ -581,6 +584,7 @@
 				F3B100000000000000000002 /* DesktopExperienceSession.swift in Sources */,
 				F3B100000000000000000003 /* DesktopRuntimeController.swift in Sources */,
 				F3B100000000000000000004 /* DesktopWidgetWindows.swift in Sources */,
+				F3B100000000000000000012 /* DesktopShell.swift in Sources */,
 				F3B100000000000000000005 /* DesktopWidgets.swift in Sources */,
 				F3B100000000000000000008 /* DockLayout.swift in Sources */,
 				F3B100000000000000000009 /* DockAppPicker.swift in Sources */,
@@ -614,14 +618,14 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.desktopstudio.app.tests;
 				PRODUCT_MODULE_NAME = DesktopStudioTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -639,7 +643,7 @@
 				CODE_SIGN_ENTITLEMENTS = DesktopStudio/DesktopStudio.Debug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -649,7 +653,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.desktopstudio.app;
 				PRODUCT_MODULE_NAME = DesktopStudio;
 				PRODUCT_NAME = "Desktop Studio";
@@ -666,7 +670,7 @@
 				CODE_SIGN_ENTITLEMENTS = DesktopStudio/DesktopStudio.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -676,7 +680,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.desktopstudio.app;
 				PRODUCT_MODULE_NAME = DesktopStudio;
 				PRODUCT_NAME = "Desktop Studio";
@@ -689,14 +693,14 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.1;
+				MARKETING_VERSION = 0.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.desktopstudio.app.tests;
 				PRODUCT_MODULE_NAME = DesktopStudioTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

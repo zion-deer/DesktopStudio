@@ -273,6 +273,44 @@ final class DesktopRuntimeTests: XCTestCase {
         return theme
     }
 
+    func testApplyCoversTheDesktopAndStopPutsTheMacDesktopBack() {
+        let harness = makeHarness()
+        let backdrop = NoDesktopBackdrop()
+        let chrome = NoSystemChrome()
+        let runtime = DesktopRuntimeController(
+            themeStore: harness.store,
+            sessionStore: harness.sessions,
+            screens: harness.screens,
+            surfaces: harness.surfaces,
+            backdrop: backdrop,
+            chrome: chrome
+        )
+        let report = runtime.apply(theme: harness.theme)
+        XCTAssertTrue(report.applied)
+        XCTAssertTrue(backdrop.isShown)
+        XCTAssertTrue(backdrop.isCoveringTheScreen)
+        XCTAssertTrue(chrome.isHidden)
+        XCTAssertTrue(report.message.contains("covers"))
+        let stopped = runtime.stopExperience()
+        XCTAssertTrue(stopped.applied)
+        XCTAssertFalse(backdrop.isShown)
+        XCTAssertFalse(backdrop.isCoveringTheScreen)
+        XCTAssertFalse(chrome.isHidden)
+    }
+
+    func testFullFrameFitCoversTheDockAndMenuBarStrips() {
+        let display = RuntimeDisplay(
+            id: 1,
+            frame: CGRect(x: 0, y: 0, width: 1000, height: 800),
+            visibleFrame: CGRect(x: 0, y: 80, width: 1000, height: 640),
+            isMain: true
+        )
+        let full = CanvasScreenMapping.fit(canvasWidth: 1000, canvasHeight: 800, display: display, area: .fullFrame)
+        let visible = CanvasScreenMapping.fit(canvasWidth: 1000, canvasHeight: 800, display: display)
+        XCTAssertEqual(full?.rect.height ?? 0, 800, accuracy: 0.1)
+        XCTAssertLessThan(visible?.rect.height ?? 1, 700)
+    }
+
     private func widget(_ type: ComponentType, x: Double, y: Double, width: Double = 100, height: Double = 50) -> DesktopComponent {
         DesktopComponent(
             id: UUID(),
