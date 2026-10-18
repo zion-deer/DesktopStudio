@@ -8,16 +8,16 @@ extension ThemeColor {
 
     init(color: Color) {
         let nsColor = NSColor(color)
-        let converted = nsColor.usingColorSpace(.sRGB) ?? nsColor
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        if converted.getRed(&red, green: &green, blue: &blue, alpha: &alpha) {
-            self.init(red: Double(red), green: Double(green), blue: Double(blue), opacity: Double(alpha))
-        } else {
-            self.init(red: 0, green: 0, blue: 0, opacity: Double(converted.alphaComponent))
+        guard let rgb = nsColor.usingColorSpace(.sRGB) ?? nsColor.usingColorSpace(.deviceRGB) else {
+            self.init(red: 0, green: 0, blue: 0, opacity: Double(nsColor.alphaComponent))
+            return
         }
+        self.init(
+            red: Double(rgb.redComponent),
+            green: Double(rgb.greenComponent),
+            blue: Double(rgb.blueComponent),
+            opacity: Double(rgb.alphaComponent)
+        )
     }
 }
 
