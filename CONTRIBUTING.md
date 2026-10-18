@@ -26,7 +26,7 @@ The current version is **0.1.0**, build **1**. Theme documents are schema **2**.
 - Record user-visible changes in `CHANGELOG.md` under `[Unreleased]`.
 - When cutting a version, move those notes under a dated heading and bump `MARKETING_VERSION`. Bump `CURRENT_PROJECT_VERSION` for every shippable build.
 
-Do not tag or publish a release from an ordinary commit.
+Do not tag or publish a release from an ordinary commit. A version tag such as `v0.2.0` must match `MARKETING_VERSION`, and `CURRENT_PROJECT_VERSION` must be greater than every build already published. `docs/UPDATES.md` lists the Apple and Sparkle secrets. Do not commit them.
 
 ## What not to commit
 

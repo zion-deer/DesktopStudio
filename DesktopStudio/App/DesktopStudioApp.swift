@@ -4,6 +4,7 @@ import SwiftUI
 struct DesktopStudioApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var model: EditorModel
+    @StateObject private var updates = UpdateCenter()
 
     init() {
         _model = StateObject(wrappedValue: EditorModel.live())
@@ -13,6 +14,7 @@ struct DesktopStudioApp: App {
         WindowGroup {
             EditorRootView()
                 .environmentObject(model)
+                .environmentObject(updates)
                 .onAppear {
                     appDelegate.terminationHandler = { [weak model] in
                         MainActor.assumeIsolated {
@@ -25,6 +27,17 @@ struct DesktopStudioApp: App {
         .windowToolbarStyle(.unified)
         .commands {
             EditorCommands()
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates…") {
+                    updates.checkForUpdates()
+                }
+                .disabled(!updates.canCheckForUpdates)
+            }
+        }
+
+        Settings {
+            UpdateSettingsView()
+                .environmentObject(updates)
         }
     }
 }

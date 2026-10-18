@@ -122,15 +122,19 @@ Run the unit tests:
 xcodebuild -project DesktopStudio.xcodeproj -scheme DesktopStudio -destination 'platform=macOS' test
 ```
 
-The test target is hosted in the app so it can read `SampleTheme.json` from the bundle. Tests cover JSON coding, schema 1 migration, built-in themes, inheritance, import and export, invalid documents, file persistence, undo and redo, stable component IDs, zoom conversion, alignment snapping, the unavailable runtime used by older editor tests, and the desktop runtime (validation, placement, display loss, wake, stop, and restore). The GitHub Actions workflow runs this test suite on every push and pull request. It does not run the manual window checks above.
+The test target is hosted in the app so it can read `SampleTheme.json` from the bundle. Tests cover JSON coding, schema 1 migration, built-in themes, inheritance, import and export, invalid documents, file persistence, undo and redo, stable component IDs, zoom conversion, alignment snapping, the unavailable runtime used by older editor tests, and the desktop runtime (validation, placement, display loss, wake, stop, and restore). The GitHub Actions workflow runs this test suite on every push and pull request. It does not run the manual window checks above, and it does not publish a release. Signed updates are described in `docs/UPDATES.md`.
 
 ## Version
 
-`MARKETING_VERSION` is `0.1.0` and `CURRENT_PROJECT_VERSION` is `1`. The app reads those values as `CFBundleShortVersionString` and `CFBundleVersion`. `AppVersion` exposes the same numbers in code. See `CONTRIBUTING.md` before bumping them, and record changes in `CHANGELOG.md`.
+`MARKETING_VERSION` is `0.1.0` and `CURRENT_PROJECT_VERSION` is `1`. The app reads those values as `CFBundleShortVersionString` and `CFBundleVersion`. `AppVersion` exposes the same numbers in code. Sparkle compares the build number when it looks for an update. See `CONTRIBUTING.md` before bumping them, and record changes in `CHANGELOG.md`.
+
+## Updates
+
+Published copies check a Sparkle appcast and install a later Developer ID release from GitHub Releases. The feed URL and Ed25519 public key are empty in a local build, so that copy does not check for updates. Configuration, secrets, and the first test release are in `docs/UPDATES.md`.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` builds and tests the Desktop Studio scheme on a `macos-15` runner for pushes and pull requests. It uses ad-hoc signing (`CODE_SIGN_IDENTITY=-`) and does not contain a team ID, certificate, or token. It does not create a release. The checkout action is pinned to commit `11bd71901bbe5b1630ceea73d27597364c9af683` (v4.2.2).
+`.github/workflows/ci.yml` builds and tests the Desktop Studio scheme on a `macos-15` runner for pushes and pull requests. It also runs the release-rule unit tests. It uses ad-hoc signing (`CODE_SIGN_IDENTITY=-`) and does not contain a team ID, certificate, or token. It does not create a release. `.github/workflows/release.yml` publishes a signed update only when a version tag is pushed or the workflow is started by hand. The checkout action is pinned to commit `11bd71901bbe5b1630ceea73d27597364c9af683` (v4.2.2).
 
 The workflow runs only after this repository is hosted on GitHub and Actions is enabled. A local `origin` remote does not by itself mean that workflow has executed.
 

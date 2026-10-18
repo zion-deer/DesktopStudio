@@ -32,6 +32,13 @@
 		8B798DC147B006265A8C50F4 /* EditorModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EBC85E71B6E7769F042E8C /* EditorModelTests.swift */; };
 		A2B93D38C4EE0799FD61D8C9 /* DesktopStudioApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF772B0F69024CFFE3E51D68 /* DesktopStudioApp.swift */; };
 		A68121664E7D5283B993531F /* StudioLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1765CC0FE0F516388B66C38 /* StudioLog.swift */; };
+		F4A0E1000000000000000003 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F4A0E1000000000000000002 /* Sparkle */; };
+		F4A0E200000000000000000A /* ReleaseRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A0E2000000000000000001 /* ReleaseRules.swift */; };
+		F4A0E200000000000000000B /* UpdatePublication.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A0E2000000000000000002 /* UpdatePublication.swift */; };
+		F4A0E200000000000000000C /* UpdateFailureCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A0E2000000000000000003 /* UpdateFailureCopy.swift */; };
+		F4A0E200000000000000000D /* UpdateCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A0E2000000000000000004 /* UpdateCenter.swift */; };
+		F4A0E200000000000000000E /* UpdateSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A0E2000000000000000005 /* UpdateSettingsView.swift */; };
+		F4A0E2000000000000000011 /* UpdateReleaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A0E2000000000000000006 /* UpdateReleaseTests.swift */; };
 		AB59485E44147D9EED7F6234 /* EditorCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = A31E2525ACE970F046F4B81C /* EditorCommands.swift */; };
 		AD8319564E847B69CECAFAF4 /* ComponentFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD108001B4E8974FD3877A9A /* ComponentFrame.swift */; };
 		AD85F23B9D33657DD083122F /* ThemePersistenceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5301BAFCF3D3C6658BF7C4D6 /* ThemePersistenceError.swift */; };
@@ -123,6 +130,14 @@
 		EADE110D1A896F118A3BF645 /* ComponentType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentType.swift; sourceTree = "<group>"; };
 		EC599C5C332E0755EF701AB7 /* ThemeColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColor.swift; sourceTree = "<group>"; };
 		EC6F8326ED5AFA1ADD5DC003 /* SampleTheme.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = SampleTheme.json; sourceTree = "<group>"; };
+		F4A0E2000000000000000001 /* ReleaseRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReleaseRules.swift; sourceTree = "<group>"; };
+		F4A0E2000000000000000002 /* UpdatePublication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePublication.swift; sourceTree = "<group>"; };
+		F4A0E2000000000000000003 /* UpdateFailureCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateFailureCopy.swift; sourceTree = "<group>"; };
+		F4A0E2000000000000000004 /* UpdateCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCenter.swift; sourceTree = "<group>"; };
+		F4A0E2000000000000000005 /* UpdateSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSettingsView.swift; sourceTree = "<group>"; };
+		F4A0E2000000000000000006 /* UpdateReleaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateReleaseTests.swift; sourceTree = "<group>"; };
+		F4A0E2000000000000000007 /* UpdatePublication.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = UpdatePublication.xcconfig; sourceTree = "<group>"; };
+		F4A0E2000000000000000008 /* DesktopStudio.Debug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DesktopStudio.Debug.entitlements; sourceTree = "<group>"; };
 		F1A100000000000000000001 /* LayoutAlignment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutAlignment.swift; sourceTree = "<group>"; };
 		F1A100000000000000000003 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
 		F1A100000000000000000005 /* LayoutGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutGeometryTests.swift; sourceTree = "<group>"; };
@@ -163,6 +178,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4A0E1000000000000000003 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,8 +250,29 @@
 				F3A100000000000000000007 /* DesktopRuntimeTests.swift */,
 				F3A10000000000000000000B /* DockConfigurationTests.swift */,
 				F3A100000000000000000010 /* LauncherTests.swift */,
+				F4A0E2000000000000000006 /* UpdateReleaseTests.swift */,
 			);
 			path = DesktopStudioTests;
+			sourceTree = "<group>";
+		};
+		F4A0E2000000000000000009 /* Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				F4A0E2000000000000000007 /* UpdatePublication.xcconfig */,
+			);
+			path = Configuration;
+			sourceTree = "<group>";
+		};
+		F4A0E2000000000000000010 /* Updates */ = {
+			isa = PBXGroup;
+			children = (
+				F4A0E2000000000000000001 /* ReleaseRules.swift */,
+				F4A0E2000000000000000002 /* UpdatePublication.swift */,
+				F4A0E2000000000000000003 /* UpdateFailureCopy.swift */,
+				F4A0E2000000000000000004 /* UpdateCenter.swift */,
+				F4A0E2000000000000000005 /* UpdateSettingsView.swift */,
+			);
+			path = Updates;
 			sourceTree = "<group>";
 		};
 		5581AD1F609B92EB2EB17288 /* Support */ = {
@@ -282,12 +319,15 @@
 				24E03A074EAB1633CA38A8D7 /* App */,
 				69E950B38DDEA4C503324033 /* Design */,
 				5F4766267053E7F87A9E8F81 /* DesktopStudio.entitlements */,
+				F4A0E2000000000000000008 /* DesktopStudio.Debug.entitlements */,
+				F4A0E2000000000000000009 /* Configuration */,
 				2C9EAD1EA0205D1A851728A9 /* Editor */,
 				D8BC2D664455A562A7309B8D /* Info.plist */,
 				B1C94029B44728FFF1FAC73D /* Models */,
 				C17B0B94E1553CC3408CE7F1 /* Persistence */,
 				C6CD78BEF0CA62C0DDF7DB0C /* Resources */,
 				EC2D23349BDB8B9FCEBE28BE /* Runtime */,
+				F4A0E2000000000000000010 /* Updates */,
 				5581AD1F609B92EB2EB17288 /* Support */,
 			);
 			path = DesktopStudio;
@@ -399,6 +439,9 @@
 			productName = "Desktop Studio";
 			productReference = B6CDB6E5D160E013280D3C68 /* Desktop Studio.app */;
 			productType = "com.apple.product-type.application";
+			packageProductDependencies = (
+				F4A0E1000000000000000002 /* Sparkle */,
+			);
 		};
 		7EC8F98B7A265120217712DE /* DesktopStudioTests */ = {
 			isa = PBXNativeTarget;
@@ -448,6 +491,9 @@
 			productRefGroup = 5151B46607EBC8890D8DFCC2 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
+			packageReferences = (
+				F4A0E1000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			targets = (
 				29C7B681C8D62CBAC94D51C0 /* Desktop Studio */,
 				7EC8F98B7A265120217712DE /* DesktopStudioTests */,
@@ -480,6 +526,7 @@
 				F3B100000000000000000007 /* DesktopRuntimeTests.swift in Sources */,
 				F3B10000000000000000000B /* DockConfigurationTests.swift in Sources */,
 				F3B100000000000000000010 /* LauncherTests.swift in Sources */,
+				F4A0E2000000000000000011 /* UpdateReleaseTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,6 +590,11 @@
 				F3B10000000000000000000E /* LauncherView.swift in Sources */,
 				F3B10000000000000000000F /* LauncherInspector.swift in Sources */,
 				A68121664E7D5283B993531F /* StudioLog.swift in Sources */,
+				F4A0E200000000000000000A /* ReleaseRules.swift in Sources */,
+				F4A0E200000000000000000B /* UpdatePublication.swift in Sources */,
+				F4A0E200000000000000000C /* UpdateFailureCopy.swift in Sources */,
+				F4A0E200000000000000000D /* UpdateCenter.swift in Sources */,
+				F4A0E200000000000000000E /* UpdateSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,10 +632,11 @@
 		};
 		440E5A6917A92EC34723EB9D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F4A0E2000000000000000007 /* UpdatePublication.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = DesktopStudio/DesktopStudio.entitlements;
+				CODE_SIGN_ENTITLEMENTS = DesktopStudio/DesktopStudio.Debug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -606,6 +659,7 @@
 		};
 		82FD79508EEAC699C8B01C6C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F4A0E2000000000000000007 /* UpdatePublication.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -795,6 +849,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F4A0E1000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = "2.10.0";
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F4A0E1000000000000000002 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4A0E1000000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 98F54143AB4E86B28C3AFEE0 /* Project object */;
 }

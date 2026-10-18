@@ -18,6 +18,10 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
+      - name: Check release rules
+        run: python3 -m unittest test_release_rules.py
+        working-directory: scripts/release
+
       - name: Build and test, including theme validation
         run: |
           xcodebuild \

@@ -14,7 +14,8 @@ Semantic versions follow the `MARKETING_VERSION` build setting. The build number
 - Display changes and wake re-place widgets. A missing display moves that widget onto the main display, still using its canvas position. An active session is restored after the app launches again.
 - Stop Desktop Experience closes widget windows and leaves saved theme content in place. Restore Default Experience closes them and writes back the theme snapshot from the moment Apply was chosen. Stop does not remove a login item.
 - The macOS Dock, menu bar, Finder, wallpaper, and system files are not modified. No Accessibility, Screen Recording, or Apple Events permission is requested.
-- Tests cover theme validation, dock layout and missing apps, widget placement, display disconnect, wake recovery, stop versus restore, and a missing theme at launch.
+- Sparkle 2.10 checks a signed appcast for published releases. A local build leaves the feed empty and does not check. Themes stay in Application Support when an update replaces the app.
+- GitHub Actions keeps build-and-test separate from the release workflow. Only a version tag, or a manual run of that workflow, can publish a Developer ID archive.
 
 - Schema 2 theme documents with global accent, background, typography, spacing, corner radius, and default component styles.
 - Components inherit that style and can override individual fields.

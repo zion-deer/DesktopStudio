@@ -1,0 +1,13 @@
+// Public update settings. These are not secrets.
+// Leave both values empty for a local build. The app then keeps the updater off
+// and explains that this copy does not check for releases.
+//
+// A published release must set both values, either here or as xcodebuild settings:
+//   DESKTOP_STUDIO_UPDATE_FEED_URL
+//   DESKTOP_STUDIO_SPARKLE_PUBLIC_KEY
+//
+// The feed URL is the stable appcast address. The public key is the base64 Ed25519
+// key printed by Sparkle's generate_keys tool. Do not put the private key here.
+
+DESKTOP_STUDIO_UPDATE_FEED_URL =
+DESKTOP_STUDIO_SPARKLE_PUBLIC_KEY =
