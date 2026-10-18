@@ -147,6 +147,7 @@ final class EditorModelTests: XCTestCase {
     }
 }
 
+@MainActor
 private final class RecordingDesktopIntegration: DesktopIntegrating {
     var appliedNames: [String] = []
 

@@ -4,7 +4,7 @@ import XCTest
 
 @MainActor
 final class DesktopRuntimeTests: XCTestCase {
-    func testCanvasPositionRoundTripsThroughAppKitCoordinates() {
+    func testCanvasPositionRoundTripsThroughAppKitCoordinates() throws {
         let display = RuntimeDisplay(id: 7, frame: CGRect(x: 100, y: 40, width: 1000, height: 500), visibleFrame: CGRect(x: 100, y: 40, width: 1000, height: 500), isMain: true)
         let fitted = CanvasScreenMapping.fit(canvasWidth: 1000, canvasHeight: 500, display: display)
         let fittedCanvas = try XCTUnwrap(fitted)

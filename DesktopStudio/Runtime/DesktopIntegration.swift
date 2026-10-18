@@ -47,6 +47,7 @@ extension DesktopIntegrating {
     var isExperienceActive: Bool { false }
 }
 
+@MainActor
 struct UnavailableDesktopIntegration: DesktopIntegrating {
     func apply(theme: Theme) -> DesktopApplyReport {
         DesktopApplyReport(
