@@ -97,8 +97,8 @@ final class DesktopRuntimeController: DesktopIntegrating {
         surfaces: any DesktopSurfaceInstalling,
         loginItems: any LoginItemRegistering = DisabledLoginItems(),
         appLauncher: any ApplicationLaunching = WorkspaceApplicationLauncher(),
-        backdrop: any DesktopBackdropInstalling = NoDesktopBackdrop(),
-        chrome: any SystemChromeHiding = NoSystemChrome()
+        backdrop: (any DesktopBackdropInstalling)? = nil,
+        chrome: (any SystemChromeHiding)? = nil
     ) {
         self.themeStore = themeStore
         self.sessionStore = sessionStore
@@ -106,8 +106,8 @@ final class DesktopRuntimeController: DesktopIntegrating {
         self.surfaces = surfaces
         self.loginItems = loginItems
         self.appLauncher = appLauncher
-        self.backdrop = backdrop
-        self.chrome = chrome
+        self.backdrop = backdrop ?? NoDesktopBackdrop()
+        self.chrome = chrome ?? NoSystemChrome()
         self.session = sessionStore.load()
     }
 

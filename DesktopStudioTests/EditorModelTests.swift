@@ -123,8 +123,8 @@ final class EditorModelTests: XCTestCase {
     }
 
     func testEstablishedVersionMatchesTheProjectConvention() {
-        XCTAssertEqual(AppVersion.establishedMarketingVersion, "0.2.6")
-        XCTAssertEqual(AppVersion.establishedBuildNumber, "8")
+        XCTAssertEqual(AppVersion.establishedMarketingVersion, "0.2.7")
+        XCTAssertEqual(AppVersion.establishedBuildNumber, "9")
         XCTAssertFalse(AppVersion.marketing.isEmpty)
         XCTAssertFalse(AppVersion.build.isEmpty)
     }
