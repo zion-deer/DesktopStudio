@@ -95,9 +95,9 @@ final class EditorModel: ObservableObject, RuntimeLayoutSink {
         return "\(count) themes have unsaved changes."
     }
 
-    init(store: any ThemeStoring, runtime: any DesktopIntegrating = UnavailableDesktopIntegration()) {
+    init(store: any ThemeStoring, runtime: (any DesktopIntegrating)? = nil) {
         self.store = store
-        self.runtime = runtime
+        self.runtime = runtime ?? UnavailableDesktopIntegration()
         themes = []
         selectedThemeID = UUID()
         savedSnapshots = [:]
