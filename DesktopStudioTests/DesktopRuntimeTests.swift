@@ -143,8 +143,7 @@ final class DesktopRuntimeTests: XCTestCase {
 
     func testRecoverSkipsAMissingThemeAndLeavesTheLibrary() throws {
         let harness = makeHarness()
-        var stored = try XCTUnwrap(harness.sessions.load())
-        stored = DesktopExperienceSession(active: true, themeID: UUID(), baseline: harness.theme, placements: [])
+        let stored = DesktopExperienceSession(active: true, themeID: UUID(), baseline: harness.theme, placements: [])
         harness.sessions.save(stored)
         let runtime = DesktopRuntimeController(
             themeStore: harness.store,
