@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "theme": {
+    "id": "8F4C2A10-6B1E-4C3A-9D2F-1A7B6C5D4E30",
+    "name": "Night Harbor",
+    "createdAt": "2026-10-18T12:00:00Z",
+    "updatedAt": "2026-10-18T12:00:00Z",
+    "canvas": {
+      "width": 1440,
+      "height": 900,
+      "style": "gradient",
+      "background": { "hex": "#0E1424", "opacity": 1 },
+      "gradientEnd": { "hex": "#243656", "opacity": 1 }
+    },
+    "components": [
+      {
+        "id": "A1000000-0000-4000-8000-000000000001",
+        "type": "text",
+        "name": "Title",
+        "frame": { "x": 56, "y": 56, "width": 620, "height": 190, "zIndex": 1 },
+        "appearance": {
+          "background": { "hex": "#000000", "opacity": 0 },
+          "foreground": { "hex": "#F4F7FB", "opacity": 1 },
+          "accent": { "hex": "#9DB7FF", "opacity": 1 },
+          "cornerRadius": 0,
+          "opacity": 1,
+          "fontSize": 44,
+          "fontDesign": "standard",
+          "fontWeight": "semibold",
+          "shadowEnabled": false,
+          "borderWidth": 0,
+          "borderColor": { "hex": "#FFFFFF", "opacity": 0 }
+        },
+        "settings": {
+          "title": "Night Harbor",
+          "body": "Late session. Quiet screen. The dock stays close, notes stay open, and the clock keeps the hour.",
+          "symbolName": "",
+          "bundleIdentifier": "",
+          "timeFormat": "system",
+          "showsDate": false,
+          "showsSeconds": false,
+          "dockItems": []
+        }
+      },
+      {
+        "id": "A1000000-0000-4000-8000-000000000002",
+        "type": "clock",
+        "name": "Clock",
+        "frame": { "x": 964, "y": 56, "width": 420, "height": 168, "zIndex": 2 },
+        "appearance": {
+          "background": { "hex": "#121826", "opacity": 0.875 },
+          "foreground": { "hex": "#F4F7FB", "opacity": 1 },
+          "accent": { "hex": "#9DB7FF", "opacity": 1 },
+          "cornerRadius": 24,
+          "opacity": 1,
+          "fontSize": 56,
+          "fontDesign": "rounded",
+          "fontWeight": "semibold",
+          "shadowEnabled": true,
+          "borderWidth": 1,
+          "borderColor": { "hex": "#FFFFFF", "opacity": 0.125 }
+        },
+        "settings": {
+          "title": "Local time",
+          "body": "",
+          "symbolName": "",
+          "bundleIdentifier": "",
+          "timeFormat": "system",
+          "showsDate": true,
+          "showsSeconds": false,
+          "dockItems": []
+        }
+      },
+      {
+        "id": "A1000000-0000-4000-8000-000000000003",
+        "type": "appShortcut",
+        "name": "Finder",
+        "frame": { "x": 56, "y": 292, "width": 210, "height": 88, "zIndex": 2 },
+        "appearance": {
+          "background": { "hex": "#161C2E", "opacity": 0.875 },
+          "foreground": { "hex": "#F4F7FB", "opacity": 1 },
+          "accent": { "hex": "#9DB7FF", "opacity": 1 },
+          "cornerRadius": 18,
+          "opacity": 1,
+          "fontSize": 16,
+          "fontDesign": "standard",
+          "fontWeight": "semibold",
+          "shadowEnabled": true,
+          "borderWidth": 1,
+          "borderColor": { "hex": "#FFFFFF", "opacity": 0.125 }
+        },
+        "settings": {
+          "title": "Finder",
+          "body": "",
+          "symbolName": "folder",
+          "bundleIdentifier": "com.apple.finder",
+          "timeFormat": "system",
+          "showsDate": false,
+          "showsSeconds": false,
+          "dockItems": []
+        }
+      },
+      {
+        "id": "A1000000-0000-4000-8000-000000000004",
+        "type": "appShortcut",
+        "name": "Safari",
+        "frame": { "x": 282, "y": 292, "width": 210, "height": 88, "zIndex": 2 },
+        "appearance": {
+          "background": { "hex": "#161C2E", "opacity": 0.875 },
+          "foreground": { "hex": "#F4F7FB", "opacity": 1 },
+          "accent": { "hex": "#9DB7FF", "opacity": 1 },
+          "cornerRadius": 18,
+          "opacity": 1,
+          "fontSize": 16,
+          "fontDesign": "standard",
+          "fontWeight": "semibold",
+          "shadowEnabled": true,
+          "borderWidth": 1,
+          "borderColor": { "hex": "#FFFFFF", "opacity": 0.125 }
+        },
+        "settings": {
+          "title": "Safari",
+          "body": "",
+          "symbolName": "safari",
+          "bundleIdentifier": "com.apple.Safari",
+          "timeFormat": "system",
+          "showsDate": false,
+          "showsSeconds": false,
+          "dockItems": []
+        }
+      },
+      {
+        "id": "A1000000-0000-4000-8000-000000000005",
+        "type": "appShortcut",
+        "name": "Music",
+        "frame": { "x": 508, "y": 292, "width": 210, "height": 88, "zIndex": 2 },
+        "appearance": {
+          "background": { "hex": "#161C2E", "opacity": 0.875 },
+          "foreground": { "hex": "#F4F7FB", "opacity": 1 },
+          "accent": { "hex": "#9DB7FF", "opacity": 1 },
+          "cornerRadius": 18,
+          "opacity": 1,
+          "fontSize": 16,
+          "fontDesign": "standard",
+          "fontWeight": "semibold",
+          "shadowEnabled": true,
+          "borderWidth": 1,
+          "borderColor": { "hex": "#FFFFFF", "opacity": 0.125 }
+        },
+        "settings": {
+          "title": "Music",
+          "body": "",
+          "symbolName": "music.note",
+          "bundleIdentifier": "com.apple.Music",
+          "timeFormat": "system",
+          "showsDate": false,
+          "showsSeconds": false,
+          "dockItems": []
+        }
+      },
+      {
+        "id": "A1000000-0000-4000-8000-000000000006",
+        "type": "notes",
+        "name": "Notes",
+        "frame": { "x": 964, "y": 252, "width": 420, "height": 460, "zIndex": 3 },
+        "appearance": {
+          "background": { "hex": "#1A2236", "opacity": 1 },
+          "foreground": { "hex": "#E7ECF5", "opacity": 1 },
+          "accent": { "hex": "#9DB7FF", "opacity": 1 },
+          "cornerRadius": 22,
+          "opacity": 1,
+          "fontSize": 22,
+          "fontDesign": "serif",
+          "fontWeight": "medium",
+          "shadowEnabled": true,
+          "borderWidth": 1,
+          "borderColor": { "hex": "#FFFFFF", "opacity": 0.125 }
+        },
+        "settings": {
+          "title": "Tonight",
+          "body": "Three things on the desk:\n— the time\n— a few apps\n— a place to think",
+          "symbolName": "",
+          "bundleIdentifier": "",
+          "timeFormat": "system",
+          "showsDate": false,
+          "showsSeconds": false,
+          "dockItems": []
+        }
+      },
+      {
+        "id": "A1000000-0000-4000-8000-000000000007",
+        "type": "dock",
+        "name": "Dock",
+        "frame": { "x": 300, "y": 792, "width": 840, "height": 72, "zIndex": 4 },
+        "appearance": {
+          "background": { "hex": "#0C101C", "opacity": 0.75 },
+          "foreground": { "hex": "#F4F7FB", "opacity": 1 },
+          "accent": { "hex": "#9DB7FF", "opacity": 1 },
+          "cornerRadius": 26,
+          "opacity": 1,
+          "fontSize": 20,
+          "fontDesign": "standard",
+          "fontWeight": "medium",
+          "shadowEnabled": true,
+          "borderWidth": 1,
+          "borderColor": { "hex": "#FFFFFF", "opacity": 0.125 }
+        },
+        "settings": {
+          "title": "Dock",
+          "body": "",
+          "symbolName": "",
+          "bundleIdentifier": "",
+          "timeFormat": "system",
+          "showsDate": false,
+          "showsSeconds": false,
+          "dockItems": [
+            { "id": "A1000000-0000-4000-8000-000000000008", "title": "Finder", "symbolName": "folder" },
+            { "id": "A1000000-0000-4000-8000-000000000009", "title": "Safari", "symbolName": "safari" },
+            { "id": "A1000000-0000-4000-8000-00000000000A", "title": "Mail", "symbolName": "envelope" },
+            { "id": "A1000000-0000-4000-8000-00000000000B", "title": "Messages", "symbolName": "message" },
+            { "id": "A1000000-0000-4000-8000-00000000000C", "title": "Music", "symbolName": "music.note" },
+            { "id": "A1000000-0000-4000-8000-00000000000D", "title": "System Settings", "symbolName": "gearshape" }
+          ]
+        }
+      }
+    ]
+  }
+}
