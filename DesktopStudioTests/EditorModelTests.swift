@@ -68,7 +68,7 @@ final class EditorModelTests: XCTestCase {
         XCTAssertTrue(model.isDirty)
     }
 
-    func testComponentIDStaysStableWhileTheFrameChanges() {
+    func testComponentIDStaysStableWhileTheFrameChanges() throws {
         let model = makeModel(themes: [SampleTheme.blank(name: "Blank")])
         model.addComponent(.text, centeredAt: CGPoint(x: 400, y: 300))
         let originalID = try XCTUnwrap(model.selectedComponent?.id)
@@ -76,8 +76,9 @@ final class EditorModelTests: XCTestCase {
         moved.x += 24
         moved.y += 12
         model.setFrame(id: originalID, frame: moved)
+        let savedX = try XCTUnwrap(model.selectedComponent?.frame.x)
         XCTAssertEqual(model.selectedComponent?.id, originalID)
-        XCTAssertEqual(model.selectedComponent?.frame.x, moved.x, accuracy: 0.001)
+        XCTAssertEqual(savedX, moved.x, accuracy: 0.001)
 
         model.duplicateSelectedComponent()
         XCTAssertNotEqual(model.selectedComponent?.id, originalID)
@@ -104,7 +105,7 @@ final class EditorModelTests: XCTestCase {
         XCTAssertEqual(decoded.components.first { $0.id == savedID }?.frame, savedFrame)
     }
 
-    func testRedoRestoresAMovedFrame() {
+    func testRedoRestoresAMovedFrame() throws {
         let model = makeModel(themes: [SampleTheme.make()])
         let component = model.orderedComponents[0]
         let original = component.frame
@@ -113,9 +114,11 @@ final class EditorModelTests: XCTestCase {
         model.select(component.id)
         model.setFrame(id: component.id, frame: moved)
         model.undo()
-        XCTAssertEqual(model.selectedComponent?.frame.x, original.x, accuracy: 0.001)
+        let undoneX = try XCTUnwrap(model.selectedComponent?.frame.x)
+        XCTAssertEqual(undoneX, original.x, accuracy: 0.001)
         model.redo()
-        XCTAssertEqual(model.selectedComponent?.frame.x, original.x + 40, accuracy: 0.001)
+        let redoneX = try XCTUnwrap(model.selectedComponent?.frame.x)
+        XCTAssertEqual(redoneX, original.x + 40, accuracy: 0.001)
         XCTAssertEqual(model.selectedComponent?.id, component.id)
     }
 

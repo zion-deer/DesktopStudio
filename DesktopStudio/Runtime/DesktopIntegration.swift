@@ -11,6 +11,7 @@ struct DesktopApplyReport: Equatable {
 }
 
 /// Boundary between saved themes and macOS windows owned by Desktop Studio.
+@MainActor
 protocol DesktopIntegrating {
     func apply(theme: Theme) -> DesktopApplyReport
     func stopExperience() -> DesktopApplyReport

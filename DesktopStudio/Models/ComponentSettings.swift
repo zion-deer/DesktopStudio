@@ -267,6 +267,21 @@ struct ComponentSettings: Codable, Hashable {
                 showsSeconds: false,
                 dockItems: []
             )
+        case .launcher:
+            return ComponentSettings(
+                title: "Launcher",
+                body: "",
+                symbolName: "magnifyingglass",
+                bundleIdentifier: "",
+                timeFormat: .system,
+                showsDate: false,
+                showsSeconds: false,
+                dockItems: [],
+                launcherFavorites: [
+                    LauncherFavorite(id: UUID(), title: "Finder", bundleIdentifier: "com.apple.finder", groupName: "Everyday"),
+                    LauncherFavorite(id: UUID(), title: "Safari", bundleIdentifier: "com.apple.Safari", groupName: "Everyday")
+                ]
+            )
         }
     }
 

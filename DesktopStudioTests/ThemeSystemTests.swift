@@ -1,6 +1,7 @@
 import XCTest
 @testable import DesktopStudio
 
+@MainActor
 final class ThemeSystemTests: XCTestCase {
     func testCurrentDocumentsUseSchema2() throws {
         let data = try ThemeCoding.encode(SampleTheme.blank(name: "Plain"))
