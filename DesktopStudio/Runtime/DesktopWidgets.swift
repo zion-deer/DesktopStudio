@@ -93,7 +93,7 @@ struct DesktopWidgetView: View {
     private func content(_ appearance: ComponentAppearance) -> some View {
         switch model.component.type {
         case .clock:
-            ClockWidgetBody(model: model, appearance: appearance, onCommit: onCommit)
+            ClockWidgetBody(model: model, appearance: appearance, onCommit: onCommit, onStop: onStop)
         case .text:
             TextWidgetBody(model: model, appearance: appearance, onCommit: onCommit)
         case .notes:
@@ -262,6 +262,7 @@ private struct ClockWidgetBody: View {
     @ObservedObject var model: WidgetModel
     var appearance: ComponentAppearance
     var onCommit: (ComponentSettings) -> Void
+    var onStop: () -> Void
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: model.component.settings.showsSeconds ? 1 : 30)) { context in
