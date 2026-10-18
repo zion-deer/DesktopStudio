@@ -410,5 +410,6 @@ final class RecordingWidgetSurface: DesktopWidgetSurface {
     func setVisible(_ visible: Bool) { self.visible = visible }
     func setStatus(_ message: String?) { status = message }
     func setLauncherShown(_ shown: Bool) { launcherShown = shown }
+    func setLayer(_ layer: DesktopWindowLayer) {}
     func close() { closed = true }
 }

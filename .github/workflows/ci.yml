@@ -24,6 +24,8 @@ jobs:
 
       - name: Build and test, including theme validation
         run: |
+
+          set +e
           xcodebuild \
             -project DesktopStudio.xcodeproj \
             -scheme DesktopStudio \
@@ -32,4 +34,13 @@ jobs:
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=YES \
-            test
+            test > "$RUNNER_TEMP/xcodebuild.log" 2>&1
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ]; then
+            grep -E "error:|fatal error:|failed \(|XCTAssert" "$RUNNER_TEMP/xcodebuild.log" | head -n 40 | while IFS= read -r line; do
+              echo "::error::$line"
+            done
+            tail -n 80 "$RUNNER_TEMP/xcodebuild.log"
+          fi
+          exit "$status"
