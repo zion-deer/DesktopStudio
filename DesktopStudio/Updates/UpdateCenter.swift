@@ -98,7 +98,7 @@ extension UpdateCenter: SPUUpdaterDelegate {
         refreshLastCheck(updater.lastUpdateCheckDate)
     }
 
-    func updater(_ updater: SPUUpdater, didFinishUpdateCycleForUpdateCheck updateCheck: SPUUpdateCheck, error: Error?) {
+    func updater(_ updater: SPUUpdater, didFinishUpdateCycleFor updateCheck: SPUUpdateCheck, error: Error?) {
         _ = updateCheck
         refreshLastCheck(updater.lastUpdateCheckDate)
         if let error {
