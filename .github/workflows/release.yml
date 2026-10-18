@@ -91,7 +91,7 @@ jobs:
           print(f"Validated {tag} as {version} build {build}")
           PY
 
-      - name: Require signing and notarization secrets
+      - name: Require the Sparkle signing key
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
@@ -103,14 +103,22 @@ jobs:
           SPARKLE_EDDSA_PRIVATE_KEY: ${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}
         run: |
           set -euo pipefail
-          missing=0
-          for name in BUILD_CERTIFICATE_BASE64 P12_PASSWORD APPLE_TEAM_ID DEVELOPER_ID_PROFILE_BASE64 APP_STORE_CONNECT_API_KEY_ID APP_STORE_CONNECT_API_ISSUER_ID APP_STORE_CONNECT_API_KEY SPARKLE_EDDSA_PRIVATE_KEY; do
+          if [ -z "$SPARKLE_EDDSA_PRIVATE_KEY" ]; then
+            echo "Missing required secret: SPARKLE_EDDSA_PRIVATE_KEY"
+            exit 1
+          fi
+          use=true
+          for name in BUILD_CERTIFICATE_BASE64 P12_PASSWORD APPLE_TEAM_ID DEVELOPER_ID_PROFILE_BASE64 APP_STORE_CONNECT_API_KEY_ID APP_STORE_CONNECT_API_ISSUER_ID APP_STORE_CONNECT_API_KEY; do
             if [ -z "${!name}" ]; then
-              echo "Missing required secret: $name"
-              missing=1
+              use=false
             fi
           done
-          exit "$missing"
+          echo "USE_DEVELOPER_ID=$use" >> "$GITHUB_ENV"
+          if [ "$use" = true ]; then
+            echo "Developer ID secrets are present. The release will be notarized."
+          else
+            echo "Apple Developer ID secrets are not set. Publishing a locally signed build."
+          fi
 
       - name: Build and test before signing
         run: |
@@ -125,7 +133,35 @@ jobs:
             CODE_SIGNING_ALLOWED=YES \
             test
 
+      - name: Build a locally signed release
+        if: env.USE_DEVELOPER_ID != 'true'
+        env:
+          UPDATE_FEED_URL: ${{ vars.DESKTOP_STUDIO_UPDATE_FEED_URL }}
+          SPARKLE_PUBLIC_ED_KEY: ${{ vars.DESKTOP_STUDIO_SPARKLE_PUBLIC_KEY }}
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -project DesktopStudio.xcodeproj \
+            -scheme DesktopStudio \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/derived" \
+            MARKETING_VERSION="$MARKETING_VERSION" \
+            CURRENT_PROJECT_VERSION="$CURRENT_PROJECT_VERSION" \
+            DESKTOP_STUDIO_UPDATE_FEED_URL="$UPDATE_FEED_URL" \
+            DESKTOP_STUDIO_SPARKLE_PUBLIC_KEY="$SPARKLE_PUBLIC_ED_KEY" \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            build
+          APP="$RUNNER_TEMP/derived/Build/Products/Release/Desktop Studio.app"
+          test -d "$APP"
+          codesign --force --deep --sign - "$APP"
+          ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/DesktopStudio-${MARKETING_VERSION}.zip"
+          echo "This build is signed to run locally. It is not notarized."
+
       - name: Import the Developer ID certificate and profile
+        if: env.USE_DEVELOPER_ID == 'true'
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
           P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
@@ -154,6 +190,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Archive and export a Developer ID app
+        if: env.USE_DEVELOPER_ID == 'true'
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           UPDATE_FEED_URL: ${{ vars.DESKTOP_STUDIO_UPDATE_FEED_URL }}
@@ -212,6 +249,7 @@ jobs:
           codesign --verify --deep --strict --verbose=2 "$RUNNER_TEMP/export/Desktop Studio.app"
 
       - name: Notarize and staple
+        if: env.USE_DEVELOPER_ID == 'true'
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
