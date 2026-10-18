@@ -65,7 +65,7 @@ final class DesktopRuntimeTests: XCTestCase {
         let report = harness.runtime.apply(theme: harness.theme)
         XCTAssertTrue(report.applied)
         XCTAssertEqual(harness.surfaces.made.count, 3)
-        XCTAssertTrue(report.message.contains("does not replace the system Dock"))
+        XCTAssertTrue(report.message.contains("covers"))
         XCTAssertFalse(report.message.contains("Skipped"))
     }
 

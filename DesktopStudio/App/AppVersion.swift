@@ -3,8 +3,8 @@ import Foundation
 /// Marketing version and build number. The Xcode project is the source of truth:
 /// `MARKETING_VERSION` is the semantic version and `CURRENT_PROJECT_VERSION` is the build number.
 enum AppVersion {
-    static let establishedMarketingVersion = "0.2.2"
-    static let establishedBuildNumber = "4"
+    static let establishedMarketingVersion = "0.2.4"
+    static let establishedBuildNumber = "6"
 
     static var marketing: String {
         bundleValue(for: "CFBundleShortVersionString") ?? establishedMarketingVersion

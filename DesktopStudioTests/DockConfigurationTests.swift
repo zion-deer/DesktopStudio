@@ -128,7 +128,7 @@ final class DockRuntimeTests: XCTestCase {
         let off = runtime.apply(theme: theme(name: "Login Off", dock: offDock))
         XCTAssertTrue(off.applied)
         XCTAssertEqual(login.enabled, false)
-        XCTAssertTrue(off.message.contains("system Dock"))
+        XCTAssertTrue(off.message.contains("covers"))
     }
 
     func testLaunchReportsAMissingApplicationAndOpensAnInstalledOne() {
