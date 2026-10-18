@@ -159,7 +159,7 @@ struct ThemeGlobals: Codable, Hashable {
                 text: style(background: "#000000", backgroundOpacity: 0, foreground: "#E8FBFF", accent: accent.hex, fontScale: 2.6, fontSize: 42, fontDesign: .rounded, fontWeight: .semibold, shadow: false),
                 appShortcut: style(background: "#101A33", backgroundOpacity: 0.9, foreground: "#E8FBFF", accent: accent.hex, fontScale: 1, fontSize: 16, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.4),
                 dock: style(background: "#070D1C", backgroundOpacity: 0.78, foreground: "#E8FBFF", accent: accent.hex, fontScale: 1.2, fontSize: 20, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.35),
-                notes: style(background: "#0C1428", foreground: "#D7F7FF", accent: accent.hex, inheritBackground: true, fontScale: 1.25, fontSize: 20, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.35)
+                notes: style(background: "#0C1428", foreground: "#D7F7FF", inheritBackground: true, accent: accent.hex, fontScale: 1.25, fontSize: 20, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.35)
             )
         )
     }

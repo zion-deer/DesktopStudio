@@ -49,9 +49,9 @@ struct ComponentCardView: View {
     private func padding(for type: ComponentType) -> CGFloat {
         let base = min(max(spacing, 0), ThemeLimits.maxSpacing)
         switch type {
-        case .dock: max(6, base * 0.55)
-        case .appShortcut: max(8, base * 0.7)
-        default: max(10, base)
+        case .dock: return max(6, base * 0.55)
+        case .appShortcut: return max(8, base * 0.7)
+        default: return max(10, base)
         }
     }
 

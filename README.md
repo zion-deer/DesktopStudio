@@ -69,7 +69,7 @@ If `xcodebuild` reports that the project is not a valid property list (often wit
 
 ```bash
 cd ~/DesktopStudio
-origin repo pull   # or git pull
+git pull origin main
 file DesktopStudio.xcodeproj/project.pbxproj   # should say "ASCII text"
 wc -c DesktopStudio.xcodeproj/project.pbxproj  # about 40000 bytes
 head -1 DesktopStudio.xcodeproj/project.pbxproj # // !$*UTF8*$!
