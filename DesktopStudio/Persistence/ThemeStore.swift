@@ -39,17 +39,38 @@ final class ThemeStore: ThemeStoring {
 
         var themes: [Theme] = []
         var issues: [ThemeLoadIssue] = []
+        var warnings: [ThemeLoadIssue] = []
         for url in jsonURLs {
+            let name = url.lastPathComponent
+            guard Self.isInsideThemesDirectory(url, directory: directoryURL), Self.isThemeFilename(name) else {
+                issues.append(ThemeLoadIssue(file: name, message: ThemePersistenceError.invalidThemePath(name).localizedDescription))
+                continue
+            }
             do {
                 let data = try Data(contentsOf: url)
-                let document = try ThemeCoding.decode(data, file: url.lastPathComponent)
-                themes.append(document.theme)
+                let decoded = try ThemeCoding.decode(data, file: name)
+                themes.append(decoded.theme)
+                if !decoded.warnings.isEmpty {
+                    warnings.append(ThemeLoadIssue(file: name, message: decoded.warnings.joined(separator: " ")))
+                }
             } catch {
-                issues.append(ThemeLoadIssue(file: url.lastPathComponent, message: error.localizedDescription))
+                issues.append(ThemeLoadIssue(file: name, message: error.localizedDescription))
             }
         }
         themes.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        return ThemeLibrary(themes: themes, issues: issues)
+        return ThemeLibrary(themes: themes, issues: issues, warnings: warnings)
+    }
+
+    static func isThemeFilename(_ name: String) -> Bool {
+        guard name.lowercased().hasSuffix(".json") else { return false }
+        let stem = String(name.dropLast(5))
+        return UUID(uuidString: stem) != nil && !stem.contains("/") && !stem.contains("..")
+    }
+
+    static func isInsideThemesDirectory(_ url: URL, directory: URL) -> Bool {
+        let folder = directory.resolvingSymlinksInPath().standardizedFileURL
+        let parent = url.resolvingSymlinksInPath().deletingLastPathComponent().standardizedFileURL
+        return parent == folder
     }
 
     func save(_ theme: Theme) throws {

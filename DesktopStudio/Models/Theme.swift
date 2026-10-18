@@ -59,13 +59,20 @@ struct Theme: Codable, Hashable, Identifiable {
     var createdAt: Date
     var updatedAt: Date
     var canvas: CanvasSettings
+    var globals: ThemeGlobals
     var components: [DesktopComponent]
 
     func validate() throws {
+        try ThemeValidation.requireText(name, field: "Theme name", limit: ThemeLimits.maxNameLength, allowNewlines: false)
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmedName.isEmpty {
             throw ThemeCodingError.invalidTheme("A theme needs a name.")
         }
+        if trimmedName.contains("/") || trimmedName.contains("\\") || trimmedName.contains("..") {
+            throw ThemeCodingError.invalidTheme("A theme name cannot be a file path.")
+        }
+        try ThemeValidation.requireFinite(canvas.width, "Display width")
+        try ThemeValidation.requireFinite(canvas.height, "Display height")
         if canvas.width < CanvasSettings.minimumWidth
             || canvas.height < CanvasSettings.minimumHeight
             || canvas.width > CanvasSettings.maximumWidth
@@ -73,27 +80,64 @@ struct Theme: Codable, Hashable, Identifiable {
         {
             throw ThemeCodingError.invalidTheme("Display size must be between 320×240 and 7680×4320.")
         }
+        try globals.validate()
+        if components.count > ThemeLimits.maxComponents {
+            throw ThemeCodingError.invalidTheme("A theme can contain at most \(ThemeLimits.maxComponents) components.")
+        }
 
         var componentIDs = Set<UUID>()
         for component in components {
             if !componentIDs.insert(component.id).inserted {
                 throw ThemeCodingError.invalidTheme("Two components share the same id \(component.id.uuidString).")
             }
-            if component.frame.width <= 0 || component.frame.height <= 0 {
-                throw ThemeCodingError.invalidTheme("\(component.name) has a width or height that is not positive.")
+            try ThemeValidation.requireText(component.name, field: "Component name", limit: ThemeLimits.maxNameLength, allowNewlines: false)
+            if component.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                throw ThemeCodingError.invalidTheme("A component needs a name.")
             }
-            var dockItemIDs = Set<UUID>()
-            for item in component.settings.dockItems {
-                if !dockItemIDs.insert(item.id).inserted {
-                    throw ThemeCodingError.invalidTheme("\(component.name) has two dock items with the same id.")
-                }
+            try component.frame.validate(named: component.name)
+            try validate(component.settings, named: component.name)
+            try validate(component.overrides, named: component.name)
+        }
+    }
+
+    private func validate(_ settings: ComponentSettings, named name: String) throws {
+        try ThemeValidation.requireText(settings.title, field: "\(name) title", limit: ThemeLimits.maxNameLength, allowNewlines: false)
+        try ThemeValidation.requireText(settings.body, field: "\(name) body", limit: ThemeLimits.maxBodyLength, allowNewlines: true)
+        try ThemeValidation.requireIdentifier(settings.symbolName, field: "\(name) symbol", limit: ThemeLimits.maxSymbolLength)
+        try ThemeValidation.requireIdentifier(settings.bundleIdentifier, field: "\(name) bundle identifier", limit: ThemeLimits.maxBundleIdentifierLength)
+        if settings.dockItems.count > ThemeLimits.maxDockItems {
+            throw ThemeCodingError.invalidTheme("\(name) can contain at most \(ThemeLimits.maxDockItems) dock items.")
+        }
+        var dockItemIDs = Set<UUID>()
+        for item in settings.dockItems {
+            if !dockItemIDs.insert(item.id).inserted {
+                throw ThemeCodingError.invalidTheme("\(name) has two dock items with the same id.")
             }
+            try ThemeValidation.requireText(item.title, field: "\(name) dock item", limit: ThemeLimits.maxNameLength, allowNewlines: false)
+            try ThemeValidation.requireIdentifier(item.symbolName, field: "\(name) dock symbol", limit: ThemeLimits.maxSymbolLength)
+        }
+    }
+
+    private func validate(_ overrides: AppearanceOverrides, named name: String) throws {
+        if let opacity = overrides.opacity {
+            try ThemeValidation.requireUnit(opacity, "\(name) opacity")
+        }
+        if let cornerRadius = overrides.cornerRadius {
+            try ThemeValidation.requireRange(cornerRadius, 0...ComponentAppearance.maximumCornerRadius, "\(name) corner radius")
+        }
+        if let fontSize = overrides.fontSize {
+            try ThemeValidation.requireRange(fontSize, ComponentAppearance.minimumFontSize...ComponentAppearance.maximumFontSize, "\(name) font size")
+        }
+        if let borderWidth = overrides.borderWidth {
+            try ThemeValidation.requireRange(borderWidth, 0...ComponentAppearance.maximumBorderWidth, "\(name) border width")
         }
     }
 }
 
 struct ThemeDocument: Codable, Hashable {
-    static let currentSchemaVersion = 1
+    /// Schema 2 adds theme globals and per-component overrides. Schema 1 documents are migrated on open.
+    static let currentSchemaVersion = 2
+    static let minimumReadableSchemaVersion = 1
 
     var schemaVersion: Int
     var theme: Theme

@@ -81,6 +81,13 @@ extension ThemeColor: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let hex = try container.decode(String.self, forKey: .hex)
         let opacity = try container.decodeIfPresent(Double.self, forKey: .opacity) ?? 1
+        guard opacity.isFinite, (0...1).contains(opacity) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .opacity,
+                in: container,
+                debugDescription: "Color opacity must be from 0 to 1."
+            )
+        }
         guard let parsed = Self.parse(hex) else {
             throw DecodingError.dataCorruptedError(
                 forKey: .hex,

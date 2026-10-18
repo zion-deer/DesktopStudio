@@ -13,7 +13,11 @@ final class EditorModel: ObservableObject {
     @Published private(set) var selectedThemeID: Theme.ID
     @Published var selectedComponentID: DesktopComponent.ID?
     @Published var isPreviewPresented = false
+    @Published var isGalleryPresented = false
+    @Published var isConfirmingBuiltInReset = false
     @Published var showsGrid = true
+    /// Preview magnification. This is editor state and is not written into the theme file.
+    @Published private(set) var canvasZoom: Double = 1
     @Published private(set) var isDirty = false
     @Published var notice: EditorNotice?
     @Published var isConfirmingQuit = false
@@ -70,6 +74,18 @@ final class EditorModel: ObservableObject {
         themes.filter { isThemeDirty($0.id) }.count
     }
 
+    static let minimumCanvasZoom = 0.5
+    static let maximumCanvasZoom = 3.0
+    static let canvasZoomSteps: [Double] = [0.5, 0.75, 1, 1.25, 1.5, 2, 2.5, 3]
+
+    var selectedBuiltIn: BuiltInTheme? {
+        BuiltInTheme.matching(id: selectedThemeID)
+    }
+
+    var canvasZoomPercent: Int {
+        Int((canvasZoom * 100).rounded())
+    }
+
     var quitMessage: String {
         let count = dirtyThemeCount
         if count == 1, let theme = themes.first(where: { isThemeDirty($0.id) }) {
@@ -109,6 +125,27 @@ final class EditorModel: ObservableObject {
     func toggleGrid() {
         showsGrid.toggle()
         editRevision += 1
+    }
+
+    func setCanvasZoom(_ zoom: Double) {
+        let clamped = min(max(zoom, Self.minimumCanvasZoom), Self.maximumCanvasZoom)
+        guard abs(clamped - canvasZoom) > 0.000_1 else { return }
+        canvasZoom = clamped
+        editRevision += 1
+    }
+
+    func zoomIn() {
+        let next = Self.canvasZoomSteps.first { $0 > canvasZoom + 0.001 } ?? Self.maximumCanvasZoom
+        setCanvasZoom(next)
+    }
+
+    func zoomOut() {
+        let next = Self.canvasZoomSteps.last { $0 < canvasZoom - 0.001 } ?? Self.minimumCanvasZoom
+        setCanvasZoom(next)
+    }
+
+    func resetCanvasZoom() {
+        setCanvasZoom(1)
     }
 
     func select(_ id: UUID?) {
@@ -224,7 +261,7 @@ final class EditorModel: ObservableObject {
             type: type,
             name: uniqueComponentName(type.defaultName),
             frame: frame,
-            appearance: ComponentAppearance.standard(for: type),
+            overrides: AppearanceOverrides(),
             settings: ComponentSettings.standard(for: type)
         )
         mutate(token: "add-\(component.id.uuidString)", continuous: false) { theme in
@@ -298,9 +335,82 @@ final class EditorModel: ObservableObject {
         guard let component = selectedComponent else { return }
         mutate(token: "reset-appearance-\(component.id.uuidString)", continuous: false) { theme in
             guard let index = theme.components.firstIndex(where: { $0.id == component.id }) else { return }
-            theme.components[index].appearance = ComponentAppearance.standard(for: component.type)
+            theme.components[index].overrides = AppearanceOverrides()
         }
-        statusText = "Reset appearance."
+        statusText = "Using the theme style."
+    }
+
+    func resetGlobalStyle() {
+        let globals = selectedBuiltIn?.make().globals ?? ThemeGlobals.standard
+        mutate(token: "reset-globals", continuous: false) { theme in
+            theme.globals = globals
+        }
+        statusText = "Restored the theme style."
+    }
+
+    func resetBuiltInContent() {
+        guard let preset = selectedBuiltIn else { return }
+        let fresh = preset.make()
+        mutate(token: "reset-builtin", continuous: false) { theme in
+            theme.name = fresh.name
+            theme.canvas = fresh.canvas
+            theme.globals = fresh.globals
+            theme.components = fresh.components
+        }
+        selectedComponentID = nil
+        statusText = "Restored “\(fresh.name)”."
+    }
+
+    func overrideBinding<Value: Equatable>(
+        _ keyPath: WritableKeyPath<AppearanceOverrides, Value?>,
+        resolved: KeyPath<ComponentAppearance, Value>,
+        token: String,
+        fallback: Value
+    ) -> Binding<Value> {
+        Binding(
+            get: {
+                guard let component = self.selectedComponent else { return fallback }
+                if let override = component.overrides[keyPath: keyPath] {
+                    return override
+                }
+                return StyleResolver.resolve(component, theme: self.selectedTheme)[keyPath: resolved]
+            },
+            set: { newValue in
+                guard let componentID = self.selectedComponentID else { return }
+                self.mutate(token: token, continuous: true) { theme in
+                    guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+                    theme.components[index].overrides[keyPath: keyPath] = newValue
+                }
+            }
+        )
+    }
+
+    func hasOverride<Value>(_ keyPath: KeyPath<AppearanceOverrides, Value?>) -> Bool {
+        selectedComponent?.overrides[keyPath: keyPath] != nil
+    }
+
+    func clearOverride<Value>(_ keyPath: WritableKeyPath<AppearanceOverrides, Value?>, token: String) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: token, continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].overrides[keyPath: keyPath] = nil
+        }
+    }
+
+    func styleBinding<Value: Equatable>(
+        type: ComponentType,
+        keyPath: WritableKeyPath<ComponentStyle, Value>,
+        token: String,
+        fallback: Value
+    ) -> Binding<Value> {
+        Binding(
+            get: { self.selectedTheme.globals.componentStyles[type][keyPath: keyPath] },
+            set: { newValue in
+                self.mutate(token: token, continuous: true) { theme in
+                    theme.globals.componentStyles[type][keyPath: keyPath] = newValue
+                }
+            }
+        )
     }
 
     func addDockItem() {
@@ -353,16 +463,21 @@ final class EditorModel: ObservableObject {
     }
 
     func newTheme() {
-        let theme = SampleTheme.blank(name: uniqueThemeName("Untitled Theme"))
-        do {
-            try store.save(theme)
-            themes.append(theme)
-            themes.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-            savedSnapshots[theme.id] = theme
-            selectTheme(theme.id)
-            statusText = "Created “\(theme.name)”."
-        } catch {
-            present(error)
+        install(SampleTheme.blank(name: uniqueThemeName("Untitled Theme")), status: "Created")
+    }
+
+    func addBuiltIn(_ preset: BuiltInTheme) {
+        if themes.contains(where: { $0.id == preset.themeID }) {
+            var copy = preset.make()
+            copy.id = UUID()
+            copy.name = uniqueThemeName(copy.name)
+            let now = Date()
+            copy.createdAt = now
+            copy.updatedAt = now
+            reidentify(&copy)
+            install(copy, status: "Added")
+        } else {
+            install(preset.make(), status: "Added")
         }
     }
 
@@ -440,42 +555,47 @@ final class EditorModel: ObservableObject {
         guard let url = ThemeFilePanel.chooseImportURL() else { return }
         do {
             let data = try ThemeFileAccess.read(url)
-            var theme = try ThemeCoding.decode(data, file: url.lastPathComponent).theme
-            theme.id = UUID()
-            theme.name = uniqueThemeName(theme.name)
-            let now = Date()
-            theme.createdAt = now
-            theme.updatedAt = now
-            theme.components = theme.components.map { component in
-                var component = component
-                component.id = UUID()
-                component.settings.dockItems = component.settings.dockItems.map { item in
-                    var item = item
-                    item.id = UUID()
-                    return item
-                }
-                return component
-            }
-            try store.save(theme)
-            themes.append(theme)
-            themes.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-            savedSnapshots[theme.id] = theme
-            selectTheme(theme.id)
-            statusText = "Imported “\(theme.name)”."
+            try importTheme(data: data, file: url.lastPathComponent)
         } catch {
             present(error)
         }
     }
 
+    func importTheme(data: Data, file: String) throws {
+        let decoded = try ThemeCoding.decode(data, file: file)
+        var theme = decoded.theme
+        theme.id = UUID()
+        theme.name = uniqueThemeName(theme.name)
+        let now = Date()
+        theme.createdAt = now
+        theme.updatedAt = now
+        reidentify(&theme)
+        try store.save(theme)
+        themes.append(theme)
+        themes.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        savedSnapshots[theme.id] = theme
+        selectTheme(theme.id)
+        if decoded.warnings.isEmpty {
+            statusText = "Imported “\(theme.name)”."
+        } else {
+            statusText = "Imported “\(theme.name)” with warnings."
+            notice = EditorNotice(title: "Imported with warnings", message: decoded.warnings.joined(separator: "\n"))
+        }
+    }
+
+    func exportedSelectedThemeData() throws -> Data {
+        var theme = selectedTheme
+        theme.updatedAt = Date()
+        try theme.validate()
+        return try ThemeCoding.encode(theme)
+    }
+
     func exportSelectedTheme() {
         guard let url = ThemeFilePanel.chooseExportURL(suggestedName: exportFilename(for: selectedTheme.name)) else { return }
         do {
-            var theme = selectedTheme
-            theme.updatedAt = Date()
-            try theme.validate()
-            let data = try ThemeCoding.encode(theme)
+            let data = try exportedSelectedThemeData()
             try ThemeFileAccess.write(data, to: url)
-            statusText = "Exported “\(theme.name)”."
+            statusText = "Exported “\(selectedTheme.name)”."
             announce(statusText)
         } catch {
             present(error)
@@ -594,17 +714,23 @@ final class EditorModel: ObservableObject {
             let library = try store.loadLibrary()
             var loaded = library.themes
             if loaded.isEmpty {
-                let sample = try loadBundledSample()
-                try store.save(sample)
-                loaded = [sample]
+                loaded = BuiltInTheme.allCases.map { $0.make() }
+                for theme in loaded {
+                    try store.save(theme)
+                }
             }
             themes = loaded
             savedSnapshots = Dictionary(uniqueKeysWithValues: loaded.map { ($0.id, $0) })
-            selectedThemeID = loaded[0].id
-            if !library.issues.isEmpty {
+            if let minimal = loaded.first(where: { $0.id == BuiltInTheme.minimalDark.themeID }) {
+                selectedThemeID = minimal.id
+            } else if let first = loaded.first {
+                selectedThemeID = first.id
+            }
+            let messages = library.issues.map(\.message) + library.warnings.map(\.message)
+            if !messages.isEmpty {
                 notice = EditorNotice(
-                    title: "Some themes could not be opened",
-                    message: library.issues.map(\.message).joined(separator: "\n\n")
+                    title: library.issues.isEmpty ? "Some themes opened with warnings" : "Some themes could not be opened",
+                    message: messages.joined(separator: "\n\n")
                 )
             }
             statusText = "Editing “\(selectedTheme.name)”."
@@ -623,13 +749,29 @@ final class EditorModel: ObservableObject {
         refreshDirtyFlag()
     }
 
-    private func loadBundledSample() throws -> Theme {
+    private func install(_ theme: Theme, status: String) {
         do {
-            let data = try ThemeResources.sampleThemeData()
-            return try ThemeCoding.decode(data, file: "SampleTheme.json").theme
+            try store.save(theme)
+            themes.append(theme)
+            themes.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            savedSnapshots[theme.id] = theme
+            selectTheme(theme.id)
+            statusText = "\(status) “\(theme.name)”."
         } catch {
-            StudioLog.persistence.error("Sample JSON failed: \(error.localizedDescription, privacy: .public)")
-            throw error
+            present(error)
+        }
+    }
+
+    private func reidentify(_ theme: inout Theme) {
+        theme.components = theme.components.map { component in
+            var component = component
+            component.id = UUID()
+            component.settings.dockItems = component.settings.dockItems.map { item in
+                var item = item
+                item.id = UUID()
+                return item
+            }
+            return component
         }
     }
 
@@ -763,7 +905,9 @@ final class EditorModel: ObservableObject {
     private func exportFilename(for name: String) -> String {
         let cleaned = name
             .replacingOccurrences(of: "/", with: "-")
+            .replacingOccurrences(of: "\\", with: "-")
             .replacingOccurrences(of: ":", with: "-")
+            .replacingOccurrences(of: "..", with: "-")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return (cleaned.isEmpty ? "Theme" : cleaned) + ".json"
     }

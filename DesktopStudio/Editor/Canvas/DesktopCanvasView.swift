@@ -3,38 +3,46 @@ import SwiftUI
 
 struct DesktopCanvasView: View {
     @EnvironmentObject private var model: EditorModel
+    var themeOverride: Theme?
     var isInteractive: Bool = true
+
+    private var displayTheme: Theme { themeOverride ?? model.selectedTheme }
 
     @FocusState private var isFocused: Bool
     @State private var liveFrames: [UUID: ComponentFrame] = [:]
     @State private var gestureOrigin: ComponentFrame?
     @State private var activeGestureID: UUID?
+    @State private var activeGuides: [AlignmentGuide] = []
     @State private var isDropTargeted = false
 
     var body: some View {
         GeometryReader { proxy in
             let canvasSize = CGSize(
-                width: model.selectedTheme.canvas.width,
-                height: model.selectedTheme.canvas.height
+                width: displayTheme.canvas.width,
+                height: displayTheme.canvas.height
             )
-            let layout = CanvasLayout.fit(canvas: canvasSize, in: proxy.size)
-            VStack(spacing: 10) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .fill(Color.black.opacity(0.55))
-                        .frame(width: layout.displaySize.width + 18, height: layout.displaySize.height + 18)
-                        .shadow(color: .black.opacity(0.35), radius: 28, y: 16)
-                        .accessibilityHidden(true)
-                    desktop(layout)
+            let zoom = isInteractive ? CGFloat(model.canvasZoom) : 1
+            let layout = CanvasLayout.fit(canvas: canvasSize, in: proxy.size, zoom: zoom)
+            ScrollView([.horizontal, .vertical]) {
+                VStack(spacing: 10) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .fill(Color.black.opacity(0.55))
+                            .frame(width: layout.displaySize.width + 18, height: layout.displaySize.height + 18)
+                            .shadow(color: .black.opacity(0.35), radius: 28, y: 16)
+                            .accessibilityHidden(true)
+                        desktop(layout)
+                    }
+                    if isInteractive {
+                        canvasFooter
+                    }
                 }
-                if isInteractive {
-                    Text("\(Int(model.selectedTheme.canvas.width)) × \(Int(model.selectedTheme.canvas.height)) display preview")
-                        .font(.caption)
-                        .foregroundStyle(StudioPalette.textTertiary)
-                        .accessibilityLabel("Display preview, \(Int(model.selectedTheme.canvas.width)) by \(Int(model.selectedTheme.canvas.height)) points")
-                }
+                .frame(
+                    minWidth: proxy.size.width,
+                    minHeight: proxy.size.height
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(StudioPalette.stage)
         .focusable(isInteractive)
@@ -56,12 +64,57 @@ struct DesktopCanvasView: View {
         }
         .onDisappear {
             liveFrames.removeAll()
+            activeGuides.removeAll()
         }
         .accessibilityIdentifier(StudioAccessibilityID.canvas)
     }
 
+    private var canvasFooter: some View {
+        HStack(spacing: 12) {
+            Text("\(Int(displayTheme.canvas.width)) × \(Int(displayTheme.canvas.height)) canvas")
+                .accessibilityLabel("Canvas layout, \(Int(displayTheme.canvas.width)) by \(Int(displayTheme.canvas.height)) points. Zoom does not change this size.")
+            Spacer(minLength: 8)
+            zoomControls
+        }
+        .font(.caption)
+        .foregroundStyle(StudioPalette.textTertiary)
+        .padding(.horizontal, 8)
+    }
+
+    private var zoomControls: some View {
+        HStack(spacing: 6) {
+            Button {
+                model.zoomOut()
+            } label: {
+                Image(systemName: "minus.magnifyingglass")
+            }
+            .accessibilityLabel("Zoom out")
+            .help("Zoom out. Command-minus.")
+
+            Text("\(model.canvasZoomPercent)%")
+                .monospacedDigit()
+                .frame(minWidth: 44)
+                .accessibilityLabel("Zoom \(model.canvasZoomPercent) percent")
+
+            Button {
+                model.zoomIn()
+            } label: {
+                Image(systemName: "plus.magnifyingglass")
+            }
+            .accessibilityLabel("Zoom in")
+            .help("Zoom in. Command-plus.")
+
+            Button("Fit") {
+                model.resetCanvasZoom()
+            }
+            .accessibilityLabel("Fit canvas")
+            .help("Reset zoom to 100 percent. Command-0.")
+        }
+        .buttonStyle(.borderless)
+    }
+
     private func desktop(_ layout: CanvasLayout) -> some View {
-        let theme = model.selectedTheme
+        let theme = displayTheme
         return ZStack(alignment: .topLeading) {
             wallpaper(theme, layout: layout)
                 .contentShape(Rectangle())
@@ -71,7 +124,8 @@ struct DesktopCanvasView: View {
                     isFocused = true
                 }
             if isInteractive && model.showsGrid {
-                GridOverlay(spacing: 80 * layout.scale)
+                let unit = EditorGeometry.grid * layout.displayScale
+                GridOverlay(spacing: unit >= 6 ? unit : unit * 8)
                     .frame(width: layout.displaySize.width, height: layout.displaySize.height)
                     .allowsHitTesting(false)
             }
@@ -94,8 +148,11 @@ struct DesktopCanvasView: View {
                 .frame(width: layout.displaySize.width, height: layout.displaySize.height)
                 .allowsHitTesting(false)
             }
-            ForEach(model.orderedComponents) { component in
-                placedComponent(component, layout: layout)
+            ForEach(orderedComponents(in: theme)) { component in
+                placedComponent(component, layout: layout, theme: theme)
+            }
+            if isInteractive {
+                AlignmentGuideOverlay(guides: activeGuides, layout: layout)
             }
         }
         .frame(width: layout.displaySize.width, height: layout.displaySize.height)
@@ -143,30 +200,61 @@ struct DesktopCanvasView: View {
         .accessibilityHidden(true)
     }
 
-    private func placedComponent(_ component: DesktopComponent, layout: CanvasLayout) -> some View {
+    private func orderedComponents(in theme: Theme) -> [DesktopComponent] {
+        theme.components.sorted { lhs, rhs in
+            if lhs.frame.zIndex == rhs.frame.zIndex {
+                return lhs.id.uuidString < rhs.id.uuidString
+            }
+            return lhs.frame.zIndex < rhs.frame.zIndex
+        }
+    }
+
+    private func placedComponent(_ component: DesktopComponent, layout: CanvasLayout, theme: Theme) -> some View {
         let frame = liveFrames[component.id] ?? component.frame
         let rect = layout.displayRect(for: frame)
-        let isSelected = model.selectedComponentID == component.id
-        return ZStack(alignment: .bottomTrailing) {
-            ComponentCardView(component: resolved(component, frame: frame), scale: layout.scale)
+        let isSelected = isInteractive && model.selectedComponentID == component.id
+        let appearance = StyleResolver.resolve(component, theme: theme)
+        return ZStack {
+            ComponentCardView(
+                component: resolved(component, frame: frame),
+                appearance: appearance,
+                spacing: theme.globals.spacing,
+                scale: layout.displayScale
+            )
                 .overlay {
-                    if isInteractive && isSelected {
-                        RoundedRectangle(cornerRadius: component.appearance.cornerRadius * layout.scale, style: .continuous)
+                    if isSelected {
+                        RoundedRectangle(cornerRadius: appearance.cornerRadius * layout.displayScale, style: .continuous)
                             .strokeBorder(StudioPalette.accent, lineWidth: 2)
                     }
                 }
-                .gesture(moveGesture(component, scale: layout.scale))
+                .gesture(moveGesture(component, layout: layout))
                 .onTapGesture {
                     guard isInteractive else { return }
                     model.select(component.id)
                     isFocused = true
                 }
-            if isInteractive && isSelected {
-                ResizeHandle()
-                    .highPriorityGesture(resizeGesture(component, scale: layout.scale))
-            }
         }
         .frame(width: rect.width, height: rect.height)
+        .overlay(alignment: .topLeading) {
+            if isInteractive && isSelected {
+                resizeHandle(component, corner: .topLeading, layout: layout)
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if isInteractive && isSelected {
+                resizeHandle(component, corner: .topTrailing, layout: layout)
+            }
+        }
+        .overlay(alignment: .bottomLeading) {
+            if isInteractive && isSelected {
+                resizeHandle(component, corner: .bottomLeading, layout: layout)
+            }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if isInteractive && isSelected {
+                resizeHandle(component, corner: .bottomTrailing, layout: layout)
+            }
+        }
         .position(x: rect.midX, y: rect.midY)
         .contextMenu {
             if isInteractive {
@@ -179,12 +267,17 @@ struct DesktopCanvasView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("\(component.type.libraryTitle), \(component.name)")
-        .accessibilityHint(isInteractive ? "Selects this component. Drag to move it. Hold Option to ignore the grid." : "Preview of \(component.name)")
+        .accessibilityHint(isInteractive ? "Selects this component. Drag to move it. Hold Option to ignore snapping." : "Preview of \(component.name)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
         .accessibilityAction(named: "Duplicate") { model.duplicateComponent(id: component.id) }
         .accessibilityAction(named: "Delete") { model.deleteComponent(id: component.id) }
         .accessibilityAction(named: "Bring Forward") { model.bringForward(component.id) }
         .accessibilityAction(named: "Send Backward") { model.sendBackward(component.id) }
+    }
+
+    private func resizeHandle(_ component: DesktopComponent, corner: ResizeCorner, layout: CanvasLayout) -> some View {
+        ResizeHandle(label: corner.accessibilityLabel)
+            .highPriorityGesture(resizeGesture(component, corner: corner, layout: layout))
     }
 
     private func resolved(_ component: DesktopComponent, frame: ComponentFrame) -> DesktopComponent {
@@ -193,7 +286,7 @@ struct DesktopCanvasView: View {
         return copy
     }
 
-    private func moveGesture(_ component: DesktopComponent, scale: CGFloat) -> some Gesture {
+    private func moveGesture(_ component: DesktopComponent, layout: CanvasLayout) -> some Gesture {
         DragGesture(minimumDistance: 4)
             .onChanged { value in
                 guard isInteractive else { return }
@@ -203,19 +296,22 @@ struct DesktopCanvasView: View {
                     isFocused = true
                 }
                 guard let origin = gestureOrigin else { return }
-                var x = origin.x + Double(value.translation.width / scale)
-                var y = origin.y + Double(value.translation.height / scale)
-                if !NSEvent.modifierFlags.contains(.option) {
-                    x = EditorGeometry.snap(x)
-                    y = EditorGeometry.snap(y)
-                }
-                liveFrames[component.id] = ComponentFrame(
-                    x: x,
-                    y: y,
-                    width: origin.width,
-                    height: origin.height,
-                    zIndex: origin.zIndex
-                ).clamped(to: model.selectedTheme.canvas)
+                let translation = layout.canvasTranslation(fromDisplay: value.translation)
+                let freePosition = NSEvent.modifierFlags.contains(.option)
+                let others = displayTheme.components
+                    .filter { $0.id != component.id }
+                    .map(\.frame)
+                let result = LayoutAlignment.translated(
+                    origin: origin,
+                    dx: translation.x,
+                    dy: translation.y,
+                    others: others,
+                    canvas: displayTheme.canvas,
+                    snapToGrid: !freePosition,
+                    align: !freePosition
+                )
+                liveFrames[component.id] = result.frame
+                activeGuides = result.guides
             }
             .onEnded { _ in
                 model.select(component.id)
@@ -223,7 +319,7 @@ struct DesktopCanvasView: View {
             }
     }
 
-    private func resizeGesture(_ component: DesktopComponent, scale: CGFloat) -> some Gesture {
+    private func resizeGesture(_ component: DesktopComponent, corner: ResizeCorner, layout: CanvasLayout) -> some Gesture {
         DragGesture(minimumDistance: 1)
             .onChanged { value in
                 guard isInteractive else { return }
@@ -232,19 +328,23 @@ struct DesktopCanvasView: View {
                     gestureOrigin = liveFrames[component.id] ?? component.frame
                 }
                 guard let origin = gestureOrigin else { return }
-                var width = origin.width + Double(value.translation.width / scale)
-                var height = origin.height + Double(value.translation.height / scale)
-                if !NSEvent.modifierFlags.contains(.option) {
-                    width = EditorGeometry.snap(width)
-                    height = EditorGeometry.snap(height)
-                }
-                liveFrames[component.id] = ComponentFrame(
-                    x: origin.x,
-                    y: origin.y,
-                    width: width,
-                    height: height,
-                    zIndex: origin.zIndex
-                ).clamped(to: model.selectedTheme.canvas)
+                let translation = layout.canvasTranslation(fromDisplay: value.translation)
+                let freePosition = NSEvent.modifierFlags.contains(.option)
+                let others = displayTheme.components
+                    .filter { $0.id != component.id }
+                    .map(\.frame)
+                let result = LayoutAlignment.resized(
+                    origin: origin,
+                    corner: corner,
+                    dx: translation.x,
+                    dy: translation.y,
+                    others: others,
+                    canvas: displayTheme.canvas,
+                    snapToGrid: !freePosition,
+                    align: !freePosition
+                )
+                liveFrames[component.id] = result.frame
+                activeGuides = result.guides
             }
             .onEnded { _ in
                 commitLiveFrame(for: component.id)
@@ -258,6 +358,34 @@ struct DesktopCanvasView: View {
         liveFrames[id] = nil
         gestureOrigin = nil
         activeGestureID = nil
+        activeGuides.removeAll()
+    }
+}
+
+private struct AlignmentGuideOverlay: View {
+    var guides: [AlignmentGuide]
+    var layout: CanvasLayout
+
+    var body: some View {
+        Canvas { context, size in
+            for guide in guides {
+                var path = Path()
+                switch guide.axis {
+                case .vertical:
+                    let x = CGFloat(guide.canvasPosition) * layout.displayScale
+                    path.move(to: CGPoint(x: x, y: 0))
+                    path.addLine(to: CGPoint(x: x, y: size.height))
+                case .horizontal:
+                    let y = CGFloat(guide.canvasPosition) * layout.displayScale
+                    path.move(to: CGPoint(x: 0, y: y))
+                    path.addLine(to: CGPoint(x: size.width, y: y))
+                }
+                context.stroke(path, with: .color(StudioPalette.accent.opacity(0.95)), lineWidth: 1)
+            }
+        }
+        .frame(width: layout.displaySize.width, height: layout.displaySize.height)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 }
 
@@ -266,7 +394,7 @@ private struct GridOverlay: View {
 
     var body: some View {
         Canvas { context, size in
-            guard spacing > 4 else { return }
+            guard spacing > 2 else { return }
             var x: CGFloat = 0
             while x <= size.width + 0.5 {
                 var path = Path()
@@ -289,14 +417,16 @@ private struct GridOverlay: View {
 }
 
 private struct ResizeHandle: View {
+    var label: String
+
     var body: some View {
         Circle()
             .fill(Color.white)
             .overlay(Circle().strokeBorder(StudioPalette.accent, lineWidth: 2))
             .frame(width: 12, height: 12)
-            .padding(8)
+            .padding(6)
             .contentShape(Rectangle())
-            .accessibilityLabel("Resize")
-            .help("Drag to resize. Hold Option to ignore the grid.")
+            .accessibilityLabel(label)
+            .help("\(label). Hold Option to ignore snapping.")
     }
 }

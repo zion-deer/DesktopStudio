@@ -5,18 +5,20 @@ enum SampleTheme {
     static let timestamp = Date(timeIntervalSince1970: 1_792_324_800)
 
     static func make() -> Theme {
-        Theme(
+        let canvas = CanvasSettings(
+            width: 1440,
+            height: 900,
+            style: .gradient,
+            background: ThemeColor(hex: "#0E1424"),
+            gradientEnd: ThemeColor(hex: "#243656")
+        )
+        return Theme(
             id: identifier,
             name: "Night Harbor",
             createdAt: timestamp,
             updatedAt: timestamp,
-            canvas: CanvasSettings(
-                width: 1440,
-                height: 900,
-                style: .gradient,
-                background: ThemeColor(hex: "#0E1424"),
-                gradientEnd: ThemeColor(hex: "#243656")
-            ),
+            canvas: canvas,
+            globals: .importedLegacy(from: canvas),
             components: [
                 text,
                 clock,
@@ -61,6 +63,7 @@ enum SampleTheme {
                 background: ThemeColor(hex: "#10141C"),
                 gradientEnd: ThemeColor(hex: "#10141C")
             ),
+            globals: .standard,
             components: []
         )
     }
@@ -71,7 +74,7 @@ enum SampleTheme {
             type: .text,
             name: "Title",
             frame: ComponentFrame(x: 56, y: 56, width: 620, height: 190, zIndex: 1),
-            appearance: appearance(
+            overrides: appearance(
                 background: "#000000",
                 backgroundOpacity: 0,
                 cornerRadius: 0,
@@ -93,7 +96,7 @@ enum SampleTheme {
             type: .clock,
             name: "Clock",
             frame: ComponentFrame(x: 964, y: 56, width: 420, height: 168, zIndex: 2),
-            appearance: appearance(
+            overrides: appearance(
                 background: "#121826",
                 backgroundOpacity: 0.875,
                 cornerRadius: 24,
@@ -114,7 +117,7 @@ enum SampleTheme {
             type: .notes,
             name: "Notes",
             frame: ComponentFrame(x: 964, y: 252, width: 420, height: 460, zIndex: 3),
-            appearance: appearance(
+            overrides: appearance(
                 background: "#1A2236",
                 foreground: "#E7ECF5",
                 cornerRadius: 22,
@@ -138,7 +141,7 @@ enum SampleTheme {
             type: .dock,
             name: "Dock",
             frame: ComponentFrame(x: 300, y: 792, width: 840, height: 72, zIndex: 4),
-            appearance: appearance(
+            overrides: appearance(
                 background: "#0C101C",
                 backgroundOpacity: 0.75,
                 cornerRadius: 26,
@@ -175,7 +178,7 @@ enum SampleTheme {
             type: .appShortcut,
             name: name,
             frame: ComponentFrame(x: x, y: 292, width: 210, height: 88, zIndex: 2),
-            appearance: appearance(
+            overrides: appearance(
                 background: "#161C2E",
                 backgroundOpacity: 0.875,
                 cornerRadius: 18,
@@ -202,8 +205,8 @@ enum SampleTheme {
         shadow: Bool,
         borderWidth: Double = 0,
         borderOpacity: Double = 0
-    ) -> ComponentAppearance {
-        ComponentAppearance(
+    ) -> AppearanceOverrides {
+        AppearanceOverrides(
             background: ThemeColor(hex: background, opacity: backgroundOpacity),
             foreground: ThemeColor(hex: foreground),
             accent: ThemeColor(hex: accent),

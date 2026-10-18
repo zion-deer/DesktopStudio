@@ -29,6 +29,15 @@ struct EditorCommands: Commands {
             Button("New Theme") { model?.newTheme() }
                 .keyboardShortcut("n")
                 .disabled(!actionsEnabled)
+            Button("New Windows Inspired Theme") { model?.addBuiltIn(.windows) }
+                .disabled(!actionsEnabled)
+            Button("New Minimal Dark Theme") { model?.addBuiltIn(.minimalDark) }
+                .disabled(!actionsEnabled)
+            Button("New Futuristic Theme") { model?.addBuiltIn(.futuristic) }
+                .disabled(!actionsEnabled)
+            Button("Theme Gallery") { model?.isGalleryPresented = true }
+                .keyboardShortcut("o", modifiers: [.command, .shift])
+                .disabled(!actionsEnabled)
             Button("Duplicate Theme") { model?.duplicateSelectedTheme() }
                 .keyboardShortcut("d", modifiers: [.command, .shift])
                 .disabled(!actionsEnabled)
@@ -75,6 +84,23 @@ struct EditorCommands: Commands {
                 .keyboardShortcut("p", modifiers: [.command, .shift])
                 .disabled(!actionsEnabled)
             Button("Apply…") { model?.applySelectedTheme() }
+                .disabled(!actionsEnabled)
+            Divider()
+            Button("Reset Theme Style") { model?.resetGlobalStyle() }
+                .disabled(!actionsEnabled)
+            Button("Reset Built-in Theme…") { model?.isConfirmingBuiltInReset = true }
+                .disabled(model?.selectedBuiltIn == nil)
+        }
+
+        CommandMenu("View") {
+            Button("Zoom In") { model?.zoomIn() }
+                .keyboardShortcut("+", modifiers: .command)
+                .disabled(!actionsEnabled)
+            Button("Zoom Out") { model?.zoomOut() }
+                .keyboardShortcut("-", modifiers: .command)
+                .disabled(!actionsEnabled)
+            Button("Actual Size") { model?.resetCanvasZoom() }
+                .keyboardShortcut("0", modifiers: .command)
                 .disabled(!actionsEnabled)
             Divider()
             Button(model?.showsGrid == true ? "Hide Grid" : "Show Grid") {

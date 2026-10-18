@@ -29,6 +29,21 @@ struct EditorRootView: View {
             ThemePreviewView()
                 .environmentObject(model)
         }
+        .sheet(isPresented: $model.isGalleryPresented) {
+            ThemeGalleryView()
+                .environmentObject(model)
+        }
+        .alert(
+            "Reset \(model.selectedTheme.name)?",
+            isPresented: $model.isConfirmingBuiltInReset
+        ) {
+            Button("Reset Theme", role: .destructive) {
+                model.resetBuiltInContent()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Wallpaper, components, and theme style return to the built-in original. You can undo this until you quit.")
+        }
         .alert(
             model.notice?.title ?? "Notice",
             isPresented: noticePresented
@@ -98,6 +113,14 @@ struct EditorRootView: View {
             .accessibilityIdentifier(StudioAccessibilityID.saveButton)
             .accessibilityLabel("Save theme")
             .help("Save the selected theme as JSON")
+
+            Button {
+                model.isGalleryPresented = true
+            } label: {
+                Label("Themes", systemImage: "rectangle.grid.2x2")
+            }
+            .accessibilityLabel("Theme gallery")
+            .help("Create, rename, duplicate, import, and export themes.")
 
             Button {
                 model.isPreviewPresented = true

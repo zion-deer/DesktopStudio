@@ -68,6 +68,64 @@ final class EditorModelTests: XCTestCase {
         XCTAssertTrue(model.isDirty)
     }
 
+    func testComponentIDStaysStableWhileTheFrameChanges() {
+        let model = makeModel(themes: [SampleTheme.blank(name: "Blank")])
+        model.addComponent(.text, centeredAt: CGPoint(x: 400, y: 300))
+        let originalID = try XCTUnwrap(model.selectedComponent?.id)
+        var moved = try XCTUnwrap(model.selectedComponent?.frame)
+        moved.x += 24
+        moved.y += 12
+        model.setFrame(id: originalID, frame: moved)
+        XCTAssertEqual(model.selectedComponent?.id, originalID)
+        XCTAssertEqual(model.selectedComponent?.frame.x, moved.x, accuracy: 0.001)
+
+        model.duplicateSelectedComponent()
+        XCTAssertNotEqual(model.selectedComponent?.id, originalID)
+        XCTAssertEqual(model.selectedTheme.components.filter { $0.id == originalID }.count, 1)
+    }
+
+    func testZoomDoesNotChangeSavedFramesOrDirtyState() throws {
+        let store = InMemoryThemeStore(themes: [SampleTheme.blank(name: "Blank")])
+        let model = EditorModel(store: store)
+        model.addComponent(.clock, centeredAt: CGPoint(x: 500, y: 240))
+        model.saveSelectedTheme()
+        let savedFrame = try XCTUnwrap(model.selectedComponent?.frame)
+        let savedID = try XCTUnwrap(model.selectedComponent?.id)
+        model.zoomIn()
+        XCTAssertGreaterThan(model.canvasZoom, 1)
+        XCTAssertFalse(model.isDirty)
+        XCTAssertEqual(model.selectedComponent?.frame, savedFrame)
+        XCTAssertEqual(model.selectedComponent?.id, savedID)
+
+        let data = try ThemeCoding.encode(model.selectedTheme)
+        let json = String(decoding: data, as: UTF8.self)
+        XCTAssertFalse(json.contains("zoom"))
+        let decoded = try ThemeCoding.decode(data, file: "theme.json").theme
+        XCTAssertEqual(decoded.components.first { $0.id == savedID }?.frame, savedFrame)
+    }
+
+    func testRedoRestoresAMovedFrame() {
+        let model = makeModel(themes: [SampleTheme.make()])
+        let component = model.orderedComponents[0]
+        let original = component.frame
+        var moved = original
+        moved.x += 40
+        model.select(component.id)
+        model.setFrame(id: component.id, frame: moved)
+        model.undo()
+        XCTAssertEqual(model.selectedComponent?.frame.x, original.x, accuracy: 0.001)
+        model.redo()
+        XCTAssertEqual(model.selectedComponent?.frame.x, original.x + 40, accuracy: 0.001)
+        XCTAssertEqual(model.selectedComponent?.id, component.id)
+    }
+
+    func testEstablishedVersionMatchesTheProjectConvention() {
+        XCTAssertEqual(AppVersion.establishedMarketingVersion, "0.1.0")
+        XCTAssertEqual(AppVersion.establishedBuildNumber, "1")
+        XCTAssertFalse(AppVersion.marketing.isEmpty)
+        XCTAssertFalse(AppVersion.build.isEmpty)
+    }
+
     func testSetFrameCanBeUndone() {
         let model = makeModel(themes: [SampleTheme.make()])
         let component = model.orderedComponents[0]

@@ -27,22 +27,27 @@ final class ThemeCodingTests: XCTestCase {
     }
 
     func testUnsupportedSchema() {
-        let json = #"{"schemaVersion":2,"theme":{"name":"Future"}}"#
+        let json = #"{"schemaVersion":99,"theme":{"name":"Future"}}"#
         XCTAssertThrowsError(try ThemeCoding.decode(Data(json.utf8), file: "Future.json")) { error in
             guard case ThemePersistenceError.unsupportedSchema(let file, let version) = error else {
                 return XCTFail("Expected unsupported schema, got \(error)")
             }
             XCTAssertEqual(file, "Future.json")
-            XCTAssertEqual(version, 2)
+            XCTAssertEqual(version, 99)
         }
     }
 
-    func testUnknownComponentType() throws {
-        let data = try ThemeCoding.encode(SampleTheme.make())
-        let json = String(decoding: data, as: UTF8.self).replacingOccurrences(of: "\"clock\"", with: "\"widget\"")
-        XCTAssertThrowsError(try ThemeCoding.decode(Data(json.utf8), file: "Broken.json")) { error in
-            XCTAssertTrue(error.localizedDescription.contains("Unknown component type"))
-        }
+    func testUnknownComponentTypeIsSkipped() throws {
+        let data = try ThemeCoding.encode(BuiltInTheme.minimalDark.make())
+        let json = String(decoding: data, as: UTF8.self)
+        let patched = json
+            .replacingOccurrences(of: "\"type\" : \"clock\"", with: "\"type\" : \"widget\"")
+            .replacingOccurrences(of: "\"type\":\"clock\"", with: "\"type\":\"widget\"")
+        XCTAssertNotEqual(patched, json)
+        let decoded = try ThemeCoding.decode(Data(patched.utf8), file: "Broken.json")
+        XCTAssertFalse(decoded.theme.components.contains { $0.type == .clock })
+        XCTAssertEqual(decoded.theme.components.count, 2)
+        XCTAssertTrue(decoded.warnings.contains { $0.contains("widget") })
     }
 
     func testDuplicateComponentIDIsRejected() throws {

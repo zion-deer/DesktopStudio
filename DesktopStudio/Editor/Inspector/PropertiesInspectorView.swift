@@ -73,11 +73,13 @@ struct PropertiesInspectorView: View {
                 }
                 .pickerStyle(.menu)
                 .accessibilityLabel("Wallpaper style")
-                ColorField(title: "Background", color: model.themeBinding(\.canvas.background, token: "canvas.background"))
+                ColorField(title: "Wallpaper", color: model.themeBinding(\.canvas.background, token: "canvas.background"))
                 if model.selectedTheme.canvas.style == .gradient {
                     ColorField(title: "Gradient end", color: model.themeBinding(\.canvas.gradientEnd, token: "canvas.gradient"))
                 }
             }
+
+            GlobalStyleInspector()
 
             InspectorSection(title: "Display") {
                 Picker("Preset", selection: presetSelection) {
@@ -131,70 +133,7 @@ struct PropertiesInspectorView: View {
                     }
                 }
 
-                InspectorSection(title: "Appearance") {
-                    ColorField(
-                        title: "Background",
-                        color: model.componentBinding(\.appearance.background, fallback: component.appearance.background, token: "appearance.background")
-                    )
-                    ColorField(
-                        title: "Foreground",
-                        color: model.componentBinding(\.appearance.foreground, fallback: component.appearance.foreground, token: "appearance.foreground")
-                    )
-                    ColorField(
-                        title: "Accent",
-                        color: model.componentBinding(\.appearance.accent, fallback: component.appearance.accent, token: "appearance.accent")
-                    )
-                    ColorField(
-                        title: "Border",
-                        color: model.componentBinding(\.appearance.borderColor, fallback: component.appearance.borderColor, token: "appearance.borderColor")
-                    )
-                    InspectorSlider(
-                        title: "Opacity",
-                        value: model.componentBinding(\.appearance.opacity, fallback: 1, token: "appearance.opacity"),
-                        range: 0...1,
-                        step: 0.05,
-                        model: model,
-                        format: "%.2f"
-                    )
-                    InspectorSlider(
-                        title: "Corner radius",
-                        value: model.componentBinding(\.appearance.cornerRadius, fallback: 0, token: "appearance.radius"),
-                        range: 0...ComponentAppearance.maximumCornerRadius,
-                        step: 1,
-                        model: model
-                    )
-                    InspectorSlider(
-                        title: "Border width",
-                        value: model.componentBinding(\.appearance.borderWidth, fallback: 0, token: "appearance.border"),
-                        range: 0...ComponentAppearance.maximumBorderWidth,
-                        step: 1,
-                        model: model
-                    )
-                    InspectorSlider(
-                        title: "Font size",
-                        value: model.componentBinding(\.appearance.fontSize, fallback: 16, token: "appearance.fontSize"),
-                        range: ComponentAppearance.minimumFontSize...ComponentAppearance.maximumFontSize,
-                        step: 1,
-                        model: model
-                    )
-                    Picker("Font", selection: model.componentBinding(\.appearance.fontDesign, fallback: .standard, token: "appearance.fontDesign")) {
-                        ForEach(StudioFontDesign.allCases) { design in
-                            Text(design.title).tag(design)
-                        }
-                    }
-                    .accessibilityLabel("Font design")
-                    Picker("Weight", selection: model.componentBinding(\.appearance.fontWeight, fallback: .regular, token: "appearance.fontWeight")) {
-                        ForEach(StudioFontWeight.allCases) { weight in
-                            Text(weight.title).tag(weight)
-                        }
-                    }
-                    .accessibilityLabel("Font weight")
-                    Toggle("Shadow", isOn: model.componentBinding(\.appearance.shadowEnabled, fallback: false, token: "appearance.shadow"))
-                    Button("Reset Appearance") {
-                        model.resetSelectedAppearance()
-                    }
-                    .accessibilityLabel("Reset appearance")
-                }
+                AppearanceInspector()
 
                 InspectorSection(title: "Actions") {
                     HStack {

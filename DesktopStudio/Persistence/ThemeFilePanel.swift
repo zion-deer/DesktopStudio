@@ -36,11 +36,14 @@ enum ThemeFileAccess {
                 url.stopAccessingSecurityScopedResource()
             }
         }
+        let data: Data
         do {
-            return try Data(contentsOf: url)
+            data = try Data(contentsOf: url)
         } catch {
             throw ThemePersistenceError.unreadableFile(url.lastPathComponent)
         }
+        try ThemeSafety.checkSize(data, file: url.lastPathComponent)
+        return data
     }
 
     static func write(_ data: Data, to url: URL) throws {

@@ -1,15 +1,51 @@
+# macOS
 .DS_Store
 .AppleDouble
 .LSOverride
-DerivedData/
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# Xcode
 build/
+DerivedData/
 *.xcuserstate
-xcuserdata/
 *.xcscmblueprint
+*.xccheckout
+*.moved-aside
 *.hmap
 *.ipa
-*.dSYM.zip
 *.dSYM
+*.dSYM.zip
+xcuserdata/
 timeline.xctimeline
 playground.xcworkspace
+*.playground
+
+# Swift Package Manager
+.build/
 .swiftpm/
+Packages/
+
+# Secrets, signing, and local configuration
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+Secrets.plist
+secrets.json
+credentials.json
+*.xcconfig.local
+
+# Editor and OS leftovers
+*.swp
+*~
+.idea/
+.vscode/

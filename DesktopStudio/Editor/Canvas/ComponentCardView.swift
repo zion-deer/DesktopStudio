@@ -2,10 +2,12 @@ import SwiftUI
 
 struct ComponentCardView: View {
     var component: DesktopComponent
+    var appearance: ComponentAppearance
+    var spacing: Double
     var scale: CGFloat
 
     var body: some View {
-        let appearance = component.appearance.sanitized()
+        let appearance = appearance.sanitized()
         let radius = appearance.cornerRadius * scale
         content(appearance)
             .padding(padding(for: component.type) * scale)
@@ -45,10 +47,11 @@ struct ComponentCardView: View {
     }
 
     private func padding(for type: ComponentType) -> CGFloat {
+        let base = min(max(spacing, 0), ThemeLimits.maxSpacing)
         switch type {
-        case .dock: 8
-        case .appShortcut: 12
-        default: 16
+        case .dock: max(6, base * 0.55)
+        case .appShortcut: max(8, base * 0.7)
+        default: max(10, base)
         }
     }
 

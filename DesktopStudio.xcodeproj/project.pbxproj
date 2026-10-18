@@ -14,6 +14,20 @@
 		26B9A8E813BAFD3E6B33CF96 /* SymbolAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6420881F945489338F09888F /* SymbolAvailability.swift */; };
 		724B2B90A35649E1538CC28A /* ThemeColor+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C50730A4F395EFD828BBBBA /* ThemeColor+SwiftUI.swift */; };
 		730BCD963D44A27EC501851D /* CanvasLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 433777C61EEC12F1672CB9BA /* CanvasLayout.swift */; };
+		F1A100000000000000000002 /* LayoutAlignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A100000000000000000001 /* LayoutAlignment.swift */; };
+		F1A100000000000000000004 /* AppVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A100000000000000000003 /* AppVersion.swift */; };
+		F1A100000000000000000006 /* LayoutGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A100000000000000000005 /* LayoutGeometryTests.swift */; };
+		F2A200000000000000000002 /* AppearanceOverrides.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000001 /* AppearanceOverrides.swift */; };
+		F2A200000000000000000004 /* ThemeGlobals.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000003 /* ThemeGlobals.swift */; };
+		F2A200000000000000000006 /* StyleResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000005 /* StyleResolver.swift */; };
+		F2A200000000000000000008 /* ThemeLimits.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000007 /* ThemeLimits.swift */; };
+		F2A20000000000000000000A /* ThemeSafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000009 /* ThemeSafety.swift */; };
+		F2A20000000000000000000C /* ThemeMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A20000000000000000000B /* ThemeMigration.swift */; };
+		F2A20000000000000000000E /* BuiltInThemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A20000000000000000000D /* BuiltInThemes.swift */; };
+		F2A200000000000000000010 /* AppearanceInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A20000000000000000000F /* AppearanceInspector.swift */; };
+		F2A200000000000000000012 /* GlobalStyleInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000011 /* GlobalStyleInspector.swift */; };
+		F2A200000000000000000014 /* ThemeGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000013 /* ThemeGalleryView.swift */; };
+		F2A200000000000000000016 /* ThemeSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000015 /* ThemeSystemTests.swift */; };
 		4BD336006DD9673D0F35BC95 /* ComponentCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D43A5F22BBBD81582FEF9A16 /* ComponentCardView.swift */; };
 		81B81092760B062783201E82 /* DesktopCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3715BD7962938C91330054 /* DesktopCanvasView.swift */; };
 		E0BA05B64740B611479F1471 /* EditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDFD179F81E4C0284597BE4B /* EditorModel.swift */; };
@@ -66,6 +80,20 @@
 		6420881F945489338F09888F /* SymbolAvailability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SymbolAvailability.swift; sourceTree = "<group>"; };
 		5C50730A4F395EFD828BBBBA /* ThemeColor+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColor+SwiftUI.swift; sourceTree = "<group>"; };
 		433777C61EEC12F1672CB9BA /* CanvasLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasLayout.swift; sourceTree = "<group>"; };
+		F1A100000000000000000001 /* LayoutAlignment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutAlignment.swift; sourceTree = "<group>"; };
+		F1A100000000000000000003 /* AppVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersion.swift; sourceTree = "<group>"; };
+		F1A100000000000000000005 /* LayoutGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutGeometryTests.swift; sourceTree = "<group>"; };
+		F2A200000000000000000001 /* AppearanceOverrides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceOverrides.swift; sourceTree = "<group>"; };
+		F2A200000000000000000003 /* ThemeGlobals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeGlobals.swift; sourceTree = "<group>"; };
+		F2A200000000000000000005 /* StyleResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleResolver.swift; sourceTree = "<group>"; };
+		F2A200000000000000000007 /* ThemeLimits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeLimits.swift; sourceTree = "<group>"; };
+		F2A200000000000000000009 /* ThemeSafety.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSafety.swift; sourceTree = "<group>"; };
+		F2A20000000000000000000B /* ThemeMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeMigration.swift; sourceTree = "<group>"; };
+		F2A20000000000000000000D /* BuiltInThemes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuiltInThemes.swift; sourceTree = "<group>"; };
+		F2A20000000000000000000F /* AppearanceInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceInspector.swift; sourceTree = "<group>"; };
+		F2A200000000000000000011 /* GlobalStyleInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalStyleInspector.swift; sourceTree = "<group>"; };
+		F2A200000000000000000013 /* ThemeGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeGalleryView.swift; sourceTree = "<group>"; };
+		F2A200000000000000000015 /* ThemeSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSystemTests.swift; sourceTree = "<group>"; };
 		D43A5F22BBBD81582FEF9A16 /* ComponentCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentCardView.swift; sourceTree = "<group>"; };
 		9A3715BD7962938C91330054 /* DesktopCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopCanvasView.swift; sourceTree = "<group>"; };
 		FDFD179F81E4C0284597BE4B /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
@@ -157,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				118C6D469D54A76496E54E7F /* AppDelegate.swift */,
+				F1A100000000000000000003 /* AppVersion.swift */,
 				FF772B0F69024CFFE3E51D68 /* DesktopStudioApp.swift */,
 				A31E2525ACE970F046F4B81C /* EditorCommands.swift */,
 			);
@@ -178,6 +207,7 @@
 			children = (
 				96F8FE5917CAA01A6DF29F53 /* Canvas */,
 				FDFD179F81E4C0284597BE4B /* EditorModel.swift */,
+				F2A200000000000000000017 /* Gallery */,
 				591AAD61B7CE7F72CE674DEB /* EditorRootView.swift */,
 				1903B163A67C6AC57DE7A05B /* Inspector */,
 				B4855DEE7DECB0F7D8945FFF /* Preview */,
@@ -190,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				433777C61EEC12F1672CB9BA /* CanvasLayout.swift */,
+				F1A100000000000000000001 /* LayoutAlignment.swift */,
 				D43A5F22BBBD81582FEF9A16 /* ComponentCardView.swift */,
 				9A3715BD7962938C91330054 /* DesktopCanvasView.swift */,
 			);
@@ -199,7 +230,9 @@
 		1903B163A67C6AC57DE7A05B /* Inspector */ = {
 			isa = PBXGroup;
 			children = (
+				F2A20000000000000000000F /* AppearanceInspector.swift */,
 				BCDB4E7A2121599F35E6DB04 /* DockItemsEditor.swift */,
+				F2A200000000000000000011 /* GlobalStyleInspector.swift */,
 				3621352A119DC711502F6297 /* InspectorControls.swift */,
 				D6AA3CF46166C63D2D3E3CF2 /* PropertiesInspectorView.swift */,
 			);
@@ -222,16 +255,28 @@
 			path = Sidebar;
 			sourceTree = "<group>";
 		};
+		F2A200000000000000000017 /* Gallery */ = {
+			isa = PBXGroup;
+			children = (
+				F2A200000000000000000013 /* ThemeGalleryView.swift */,
+			);
+			path = Gallery;
+			sourceTree = "<group>";
+		};
 		B1C94029B44728FFF1FAC73D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F2A200000000000000000001 /* AppearanceOverrides.swift */,
 				F30F872F53AFF4399385A64C /* ComponentAppearance.swift */,
 				DD108001B4E8974FD3877A9A /* ComponentFrame.swift */,
 				41621E5A29B7E2A3FD6A194F /* ComponentSettings.swift */,
 				EADE110D1A896F118A3BF645 /* ComponentType.swift */,
 				8F7187AB7CFF17DE35DBEB6D /* DesktopComponent.swift */,
+				F2A200000000000000000005 /* StyleResolver.swift */,
 				6EAC9A85BC184EA547CC0AE1 /* Theme.swift */,
 				EC599C5C332E0755EF701AB7 /* ThemeColor.swift */,
+				F2A200000000000000000003 /* ThemeGlobals.swift */,
+				F2A200000000000000000007 /* ThemeLimits.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -239,8 +284,11 @@
 		C17B0B94E1553CC3408CE7F1 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
+				F2A20000000000000000000D /* BuiltInThemes.swift */,
 				5E37D20A158EC5F973027DBE /* InMemoryThemeStore.swift */,
 				BF4B7302FE3831F22419F015 /* SampleTheme.swift */,
+				F2A20000000000000000000B /* ThemeMigration.swift */,
+				F2A200000000000000000009 /* ThemeSafety.swift */,
 				E3AEFADD8DCEC417C91623A8 /* ThemeCoding.swift */,
 				1FC98D0CBC280F26A957EC98 /* ThemeFilePanel.swift */,
 				5301BAFCF3D3C6658BF7C4D6 /* ThemePersistenceError.swift */,
@@ -279,6 +327,8 @@
 			isa = PBXGroup;
 			children = (
 				B5EBC85E71B6E7769F042E8C /* EditorModelTests.swift */,
+				F1A100000000000000000005 /* LayoutGeometryTests.swift */,
+				F2A200000000000000000015 /* ThemeSystemTests.swift */,
 				F5D6E0CD527BF545D01A7504 /* ThemeCodingTests.swift */,
 				CD1ED65F0897123A3586F2BC /* ThemeStoreTests.swift */,
 			);
@@ -384,6 +434,18 @@
 				26B9A8E813BAFD3E6B33CF96 /* SymbolAvailability.swift in Sources */,
 				724B2B90A35649E1538CC28A /* ThemeColor+SwiftUI.swift in Sources */,
 				730BCD963D44A27EC501851D /* CanvasLayout.swift in Sources */,
+				F1A100000000000000000002 /* LayoutAlignment.swift in Sources */,
+				F1A100000000000000000004 /* AppVersion.swift in Sources */,
+				F2A200000000000000000002 /* AppearanceOverrides.swift in Sources */,
+				F2A200000000000000000004 /* ThemeGlobals.swift in Sources */,
+				F2A200000000000000000006 /* StyleResolver.swift in Sources */,
+				F2A200000000000000000008 /* ThemeLimits.swift in Sources */,
+				F2A20000000000000000000A /* ThemeSafety.swift in Sources */,
+				F2A20000000000000000000C /* ThemeMigration.swift in Sources */,
+				F2A20000000000000000000E /* BuiltInThemes.swift in Sources */,
+				F2A200000000000000000010 /* AppearanceInspector.swift in Sources */,
+				F2A200000000000000000012 /* GlobalStyleInspector.swift in Sources */,
+				F2A200000000000000000014 /* ThemeGalleryView.swift in Sources */,
 				4BD336006DD9673D0F35BC95 /* ComponentCardView.swift in Sources */,
 				81B81092760B062783201E82 /* DesktopCanvasView.swift in Sources */,
 				E0BA05B64740B611479F1471 /* EditorModel.swift in Sources */,
@@ -417,6 +479,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B798DC147B006265A8C50F4 /* EditorModelTests.swift in Sources */,
+				F1A100000000000000000006 /* LayoutGeometryTests.swift in Sources */,
+				F2A200000000000000000016 /* ThemeSystemTests.swift in Sources */,
 				3AC8926972AD8948B038DA2C /* ThemeCodingTests.swift in Sources */,
 				59E17B9A0F17F126B7879003 /* ThemeStoreTests.swift in Sources */,
 			);

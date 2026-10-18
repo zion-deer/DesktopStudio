@@ -1,5 +1,10 @@
 import Foundation
 
+struct DecodedTheme: Equatable {
+    var theme: Theme
+    var warnings: [String]
+}
+
 enum ThemeCoding {
     static func encode(_ theme: Theme) throws -> Data {
         let encoder = JSONEncoder()
@@ -14,38 +19,40 @@ enum ThemeCoding {
         }
     }
 
-    static func decode(_ data: Data, file: String) throws -> ThemeDocument {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-
-        let version: Int
+    static func decode(_ data: Data, file: String) throws -> DecodedTheme {
+        try ThemeSafety.checkSize(data, file: file)
+        let parsed: Any
         do {
-            version = try decoder.decode(SchemaEnvelope.self, from: data).schemaVersion
-        } catch let error as DecodingError {
-            throw ThemePersistenceError.invalidDocument(file: file, reason: describe(error))
+            parsed = try JSONSerialization.jsonObject(with: data)
         } catch {
-            throw ThemePersistenceError.invalidDocument(file: file, reason: error.localizedDescription)
+            throw ThemePersistenceError.invalidDocument(file: file, reason: "The file is not valid JSON.")
+        }
+        guard let documentObject = parsed as? [String: Any] else {
+            throw ThemePersistenceError.invalidDocument(file: file, reason: "A theme document must be a JSON object.")
         }
 
-        guard version == ThemeDocument.currentSchemaVersion else {
-            throw ThemePersistenceError.unsupportedSchema(file: file, version: version)
-        }
-
-        let document: ThemeDocument
+        let prepared: PreparedThemeDocument
         do {
-            document = try decoder.decode(ThemeDocument.self, from: data)
-        } catch let error as DecodingError {
-            throw ThemePersistenceError.invalidDocument(file: file, reason: describe(error))
-        } catch {
-            throw ThemePersistenceError.invalidDocument(file: file, reason: error.localizedDescription)
-        }
-
-        do {
-            try document.theme.validate()
+            try ThemeSafety.scan(documentObject)
+            prepared = try ThemeMigration.prepare(documentObject)
         } catch let error as ThemeCodingError {
             throw map(error, file: file)
         }
-        return document
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let document: ThemeDocument
+        do {
+            document = try decoder.decode(ThemeDocument.self, from: prepared.json)
+            try document.theme.validate()
+        } catch let error as ThemeCodingError {
+            throw map(error, file: file)
+        } catch let error as DecodingError {
+            throw ThemePersistenceError.invalidDocument(file: file, reason: describe(error))
+        } catch {
+            throw ThemePersistenceError.invalidDocument(file: file, reason: error.localizedDescription)
+        }
+        return DecodedTheme(theme: document.theme, warnings: prepared.warnings)
     }
 
     private static func map(_ error: ThemeCodingError, file: String) -> ThemePersistenceError {
@@ -82,6 +89,3 @@ enum ThemeCoding {
     }
 }
 
-private struct SchemaEnvelope: Decodable {
-    var schemaVersion: Int
-}
