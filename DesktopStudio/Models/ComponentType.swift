@@ -6,6 +6,7 @@ enum ComponentType: String, Hashable, CaseIterable, Identifiable {
     case appShortcut
     case dock
     case notes
+    case launcher
 
     var id: String { rawValue }
 
@@ -16,6 +17,7 @@ enum ComponentType: String, Hashable, CaseIterable, Identifiable {
         case .appShortcut: "App Shortcut"
         case .dock: "Dock"
         case .notes: "Notes"
+        case .launcher: "Launcher"
         }
     }
 
@@ -24,8 +26,9 @@ enum ComponentType: String, Hashable, CaseIterable, Identifiable {
         case .clock: "Time and date"
         case .text: "Title and paragraph"
         case .appShortcut: "A pinned application"
-        case .dock: "A row of applications"
+        case .dock: "Pinned applications"
         case .notes: "A scratch pad"
+        case .launcher: "Search and pinned apps"
         }
     }
 
@@ -36,6 +39,7 @@ enum ComponentType: String, Hashable, CaseIterable, Identifiable {
         case .appShortcut: "square.grid.2x2"
         case .dock: "dock.rectangle"
         case .notes: "note.text"
+        case .launcher: "magnifyingglass"
         }
     }
 
@@ -48,6 +52,7 @@ enum ComponentType: String, Hashable, CaseIterable, Identifiable {
         case .appShortcut: 220
         case .dock: 720
         case .notes: 360
+        case .launcher: 460
         }
     }
 
@@ -58,6 +63,7 @@ enum ComponentType: String, Hashable, CaseIterable, Identifiable {
         case .appShortcut: 88
         case .dock: 74
         case .notes: 280
+        case .launcher: 560
         }
     }
 }
@@ -69,7 +75,7 @@ extension ComponentType: Codable {
         guard let value = ComponentType(rawValue: rawValue) else {
             throw DecodingError.dataCorruptedError(
                 in: container,
-                debugDescription: "Unknown component type “\(rawValue)”. Expected clock, text, appShortcut, dock, or notes."
+                debugDescription: "Unknown component type “\(rawValue)”. Expected clock, text, appShortcut, dock, notes, or launcher."
             )
         }
         self = value

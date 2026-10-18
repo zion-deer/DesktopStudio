@@ -139,7 +139,7 @@ enum ThemeMigration {
                 try requireKeys(typography, allowed: ["fontDesign", "fontWeight", "baseFontSize"], context: "typography")
             }
             if let styles = globals["componentStyles"] as? [String: Any] {
-                try requireKeys(styles, allowed: ["clock", "text", "appShortcut", "dock", "notes"], context: "component styles")
+                try requireKeys(styles, allowed: ["clock", "text", "appShortcut", "dock", "notes", "launcher"], context: "component styles")
                 for (name, value) in styles {
                     guard let style = value as? [String: Any] else {
                         throw ThemeCodingError.invalidTheme("The \(name) style must be an object.")
@@ -158,7 +158,7 @@ enum ThemeMigration {
         if let settings = component["settings"] as? [String: Any] {
             try requireKeys(
                 settings,
-                allowed: ["title", "body", "symbolName", "bundleIdentifier", "timeFormat", "showsDate", "showsSeconds", "dockItems"],
+                allowed: ["title", "body", "symbolName", "bundleIdentifier", "timeFormat", "showsDate", "showsSeconds", "dockItems", "dockIconSize", "dockSpacing", "dockPadding", "dockAlignment", "dockEdge", "launchAtLogin", "launcherFavorites", "launcherSpacing", "launcherPlacement", "launcherShortcutKey", "launcherShortcutModifiers"],
                 context: "settings"
             )
             if let items = settings["dockItems"] as? [Any] {
@@ -166,7 +166,15 @@ enum ThemeMigration {
                     guard let dockItem = item as? [String: Any] else {
                         throw ThemeCodingError.invalidTheme("A dock item must be an object.")
                     }
-                    try requireKeys(dockItem, allowed: ["id", "title", "symbolName"], context: "dock item")
+                    try requireKeys(dockItem, allowed: ["id", "title", "symbolName", "bundleIdentifier", "pinned"], context: "dock item")
+                }
+            }
+            if let favorites = settings["launcherFavorites"] as? [Any] {
+                for item in favorites {
+                    guard let favorite = item as? [String: Any] else {
+                        throw ThemeCodingError.invalidTheme("A launcher favorite must be an object.")
+                    }
+                    try requireKeys(favorite, allowed: ["id", "title", "bundleIdentifier", "groupName"], context: "launcher favorite")
                 }
             }
         }

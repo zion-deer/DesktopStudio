@@ -135,6 +135,20 @@ struct ComponentAppearance: Codable, Hashable {
                 borderWidth: 1,
                 borderColor: ThemeColor(hex: "#FFFFFF", opacity: 0.125)
             )
+        case .launcher:
+            return ComponentAppearance(
+                background: ThemeColor(hex: "#1C1C1E", opacity: 0.94),
+                foreground: ThemeColor(hex: "#F5F5F7"),
+                accent: ThemeColor(hex: "#9DB7FF"),
+                cornerRadius: 16,
+                opacity: 1,
+                fontSize: 15,
+                fontDesign: .standard,
+                fontWeight: .regular,
+                shadowEnabled: true,
+                borderWidth: 1,
+                borderColor: ThemeColor(hex: "#FFFFFF", opacity: 0.12)
+            )
         }
     }
 }

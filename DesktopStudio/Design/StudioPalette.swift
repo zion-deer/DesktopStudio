@@ -21,4 +21,5 @@ enum StudioAccessibilityID {
     static let canvas = "desktopCanvas"
     static let library = "componentLibrary"
     static let inspector = "propertiesInspector"
+    static let stopDesktopButton = "stopDesktopExperience"
 }

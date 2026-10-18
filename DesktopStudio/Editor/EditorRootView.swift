@@ -140,8 +140,21 @@ struct EditorRootView: View {
             .buttonStyle(.borderedProminent)
             .accessibilityIdentifier(StudioAccessibilityID.applyButton)
             .accessibilityLabel("Apply theme")
-            .accessibilityHint("Reports whether the theme can be applied. This version does not change the Mac desktop.")
-            .help("Apply is not connected to the desktop yet.")
+            .accessibilityHint("Opens clock, text, notes, and app shortcut windows for this theme.")
+            .help("Show this theme’s widgets in desktop windows.")
+
+            if model.isDesktopExperienceActive {
+                Button {
+                    model.stopDesktopExperience()
+                } label: {
+                    Label("Stop Desktop Experience", systemImage: "stop.circle")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.red)
+                .accessibilityIdentifier(StudioAccessibilityID.stopDesktopButton)
+                .accessibilityLabel("Stop Desktop Experience")
+                .help("Closes Desktop Studio widget windows. The Dock, menu bar, and Finder stay as they are.")
+            }
         }
     }
 
@@ -150,7 +163,9 @@ struct EditorRootView: View {
             Text(model.statusText)
                 .lineLimit(1)
             Spacer()
-            Text("The canvas is a preview. Your Mac desktop is unchanged.")
+            Text(model.isDesktopExperienceActive
+                 ? "Widget windows are open. Stop Desktop Experience closes them."
+                 : "Apply opens widget windows. The Dock, menu bar, and Finder stay in place.")
                 .lineLimit(1)
         }
         .font(.caption)

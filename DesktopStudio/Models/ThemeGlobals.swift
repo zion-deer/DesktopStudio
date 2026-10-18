@@ -41,6 +41,23 @@ struct ComponentStyleSheet: Codable, Hashable {
     var appShortcut: ComponentStyle
     var dock: ComponentStyle
     var notes: ComponentStyle
+    var launcher: ComponentStyle
+
+    init(
+        clock: ComponentStyle,
+        text: ComponentStyle,
+        appShortcut: ComponentStyle,
+        dock: ComponentStyle,
+        notes: ComponentStyle,
+        launcher: ComponentStyle
+    ) {
+        self.clock = clock
+        self.text = text
+        self.appShortcut = appShortcut
+        self.dock = dock
+        self.notes = notes
+        self.launcher = launcher
+    }
 
     subscript(type: ComponentType) -> ComponentStyle {
         get {
@@ -50,6 +67,7 @@ struct ComponentStyleSheet: Codable, Hashable {
             case .appShortcut: appShortcut
             case .dock: dock
             case .notes: notes
+            case .launcher: launcher
             }
         }
         set {
@@ -59,6 +77,7 @@ struct ComponentStyleSheet: Codable, Hashable {
             case .appShortcut: appShortcut = newValue
             case .dock: dock = newValue
             case .notes: notes = newValue
+            case .launcher: launcher = newValue
             }
         }
     }
@@ -69,7 +88,41 @@ struct ComponentStyleSheet: Codable, Hashable {
         try appShortcut.validate(as: "App shortcut style")
         try dock.validate(as: "Dock style")
         try notes.validate(as: "Notes style")
+        try launcher.validate(as: "Launcher style")
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case clock, text, appShortcut, dock, notes, launcher
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        clock = try container.decode(ComponentStyle.self, forKey: .clock)
+        text = try container.decode(ComponentStyle.self, forKey: .text)
+        appShortcut = try container.decode(ComponentStyle.self, forKey: .appShortcut)
+        dock = try container.decode(ComponentStyle.self, forKey: .dock)
+        notes = try container.decode(ComponentStyle.self, forKey: .notes)
+        launcher = try container.decodeIfPresent(ComponentStyle.self, forKey: .launcher) ?? Self.fallbackLauncher
+    }
+
+    static let fallbackLauncher = ComponentStyle(
+        inheritBackground: false,
+        background: ThemeColor(hex: "#1C1C1E", opacity: 0.94),
+        foreground: ThemeColor(hex: "#F5F5F7"),
+        inheritAccent: true,
+        accent: ThemeColor(hex: "#9DB7FF"),
+        inheritCornerRadius: false,
+        cornerRadius: 16,
+        opacity: 1,
+        inheritTypography: true,
+        fontScale: 1,
+        fontSize: 15,
+        fontDesign: .standard,
+        fontWeight: .regular,
+        shadowEnabled: true,
+        borderWidth: 1,
+        borderColor: ThemeColor(hex: "#FFFFFF", opacity: 0.12)
+    )
 }
 
 /// Theme-wide wallpaper is stored on the canvas. These globals cover accent, surfaces, type, and default component styles.
@@ -122,7 +175,8 @@ struct ThemeGlobals: Codable, Hashable {
                 text: style(background: "#000000", backgroundOpacity: 0, foreground: "#F5F5F5", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 0, fontScale: 2.4, fontSize: 42, shadow: false),
                 appShortcut: style(background: "#16161A", foreground: "#F5F5F5", accent: accent.hex, fontScale: 0.9, fontSize: 16, shadow: false, borderOpacity: 0.08),
                 dock: style(background: "#101012", backgroundOpacity: 0.92, foreground: "#F5F5F5", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 18, fontScale: 1.1, fontSize: 18, shadow: false, borderOpacity: 0.08),
-                notes: style(background: "#16161A", foreground: "#D0D0D0", accent: accent.hex, fontScale: 1.15, fontSize: 20, fontDesign: .serif, shadow: false, borderOpacity: 0.08)
+                notes: style(background: "#16161A", foreground: "#D0D0D0", accent: accent.hex, fontScale: 1.15, fontSize: 20, fontDesign: .serif, shadow: false, borderOpacity: 0.08),
+                launcher: style(background: "#1C1C1E", backgroundOpacity: 0.94, foreground: "#F5F5F7", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 16, fontScale: 1, fontSize: 15, shadow: true, borderOpacity: 0.12)
             )
         )
     }
@@ -140,7 +194,8 @@ struct ThemeGlobals: Codable, Hashable {
                 text: style(background: "#000000", backgroundOpacity: 0, foreground: "#FFFFFF", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 0, inheritTypography: false, fontScale: 2.6, fontSize: 40, fontWeight: .semibold, shadow: false),
                 appShortcut: style(background: "#F3F3F3", foreground: "#1A1A1A", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 4, fontScale: 1, fontSize: 15, fontWeight: .semibold, shadow: true, borderOpacity: 0.08),
                 dock: style(background: "#1F1F1F", backgroundOpacity: 0.96, foreground: "#FFFFFF", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 0, fontScale: 1.15, fontSize: 18, shadow: true),
-                notes: style(background: "#FFF4C4", foreground: "#1A1A1A", inheritAccent: false, accent: "#8A6A00", inheritCornerRadius: false, cornerRadius: 2, inheritTypography: false, fontScale: 1.2, fontSize: 18, fontDesign: .serif, fontWeight: .regular, shadow: true, borderOpacity: 0.08)
+                notes: style(background: "#FFF4C4", foreground: "#1A1A1A", inheritAccent: false, accent: "#8A6A00", inheritCornerRadius: false, cornerRadius: 2, inheritTypography: false, fontScale: 1.2, fontSize: 18, fontDesign: .serif, fontWeight: .regular, shadow: true, borderOpacity: 0.08),
+                launcher: style(background: "#F3F3F3", backgroundOpacity: 0.96, foreground: "#1A1A1A", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 8, inheritTypography: false, fontScale: 1, fontSize: 15, fontWeight: .regular, shadow: true, borderOpacity: 0.08)
             )
         )
     }
@@ -159,7 +214,8 @@ struct ThemeGlobals: Codable, Hashable {
                 text: style(background: "#000000", backgroundOpacity: 0, foreground: "#E8FBFF", accent: accent.hex, fontScale: 2.6, fontSize: 42, fontDesign: .rounded, fontWeight: .semibold, shadow: false),
                 appShortcut: style(background: "#101A33", backgroundOpacity: 0.9, foreground: "#E8FBFF", accent: accent.hex, fontScale: 1, fontSize: 16, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.4),
                 dock: style(background: "#070D1C", backgroundOpacity: 0.78, foreground: "#E8FBFF", accent: accent.hex, fontScale: 1.2, fontSize: 20, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.35),
-                notes: style(background: "#0C1428", foreground: "#D7F7FF", inheritBackground: true, accent: accent.hex, fontScale: 1.25, fontSize: 20, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.35)
+                notes: style(background: "#0C1428", foreground: "#D7F7FF", inheritBackground: true, accent: accent.hex, fontScale: 1.25, fontSize: 20, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.35),
+                launcher: style(background: "#101A33", backgroundOpacity: 0.92, foreground: "#E8FBFF", accent: accent.hex, inheritCornerRadius: false, cornerRadius: 22, fontScale: 1, fontSize: 16, fontDesign: .rounded, shadow: true, border: "#39F3FF", borderOpacity: 0.35)
             )
         )
     }

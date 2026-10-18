@@ -43,6 +43,8 @@ struct ComponentCardView: View {
             ShortcutFace(component: component, appearance: appearance, scale: scale)
         case .dock:
             DockFace(component: component, appearance: appearance, scale: scale)
+        case .launcher:
+            LauncherFace(component: component, appearance: appearance, scale: scale)
         }
     }
 
@@ -229,5 +231,40 @@ private struct DockFace: View {
     private func symbol(_ name: String) -> String {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? "app.fill" : trimmed
+    }
+}
+
+private struct LauncherFace: View {
+    var component: DesktopComponent
+    var appearance: ComponentAppearance
+    var scale: CGFloat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8 * scale) {
+            Text("Search applications")
+                .font(.system(size: max(11, appearance.fontSize * scale), weight: .medium))
+                .foregroundStyle(appearance.foreground.color.opacity(0.7))
+                .padding(8 * scale)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(appearance.foreground.color.opacity(0.08), in: RoundedRectangle(cornerRadius: 8 * scale))
+            ForEach(LauncherSearch.grouped(component.settings.launcherFavorites), id: \.name) { group in
+                Text(group.name)
+                    .font(.system(size: max(9, 11 * scale), weight: .semibold))
+                    .foregroundStyle(appearance.accent.color)
+                ForEach(group.items) { item in
+                    Text(item.title)
+                        .font(.system(size: max(10, 13 * scale)))
+                        .foregroundStyle(appearance.foreground.color)
+                        .lineLimit(1)
+                }
+            }
+            if component.settings.launcherFavorites.isEmpty {
+                Text("Pinned apps show here.")
+                    .font(.system(size: max(10, 12 * scale)))
+                    .foregroundStyle(appearance.foreground.color.opacity(0.65))
+            }
+            Spacer(minLength: 0)
+        }
+        .accessibilityLabel("Launcher")
     }
 }

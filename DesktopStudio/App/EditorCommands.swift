@@ -85,6 +85,14 @@ struct EditorCommands: Commands {
                 .disabled(!actionsEnabled)
             Button("Apply…") { model?.applySelectedTheme() }
                 .disabled(!actionsEnabled)
+            Button("Open Launcher") { model?.toggleLauncher() }
+                .keyboardShortcut("l", modifiers: [.command, .shift])
+                .disabled(model?.isDesktopExperienceActive != true || !menuRefresh)
+            Button("Stop Desktop Experience") { model?.stopDesktopExperience() }
+                .keyboardShortcut(".", modifiers: [.command, .shift])
+                .disabled(model?.isDesktopExperienceActive != true || !menuRefresh)
+            Button("Restore Default Experience") { model?.restoreDefaultDesktop() }
+                .disabled(!actionsEnabled)
             Divider()
             Button("Reset Theme Style") { model?.resetGlobalStyle() }
                 .disabled(!actionsEnabled)
@@ -113,6 +121,10 @@ struct EditorCommands: Commands {
 
     /// Reads the focused revision so menu enablement refreshes after edits.
     private var actionsEnabled: Bool {
-        model != nil && (revision ?? 0) >= 0
+        model != nil && menuRefresh
+    }
+
+    private var menuRefresh: Bool {
+        (revision ?? 0) >= 0
     }
 }

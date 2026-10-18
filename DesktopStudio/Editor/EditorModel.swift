@@ -8,7 +8,7 @@ struct EditorNotice: Identifiable, Equatable {
 }
 
 @MainActor
-final class EditorModel: ObservableObject {
+final class EditorModel: ObservableObject, RuntimeLayoutSink {
     @Published private(set) var themes: [Theme]
     @Published private(set) var selectedThemeID: Theme.ID
     @Published var selectedComponentID: DesktopComponent.ID?
@@ -25,6 +25,7 @@ final class EditorModel: ObservableObject {
     @Published private(set) var statusText = "Ready"
     @Published private(set) var editRevision = 0
     @Published private(set) var lastApplyReport: DesktopApplyReport?
+    @Published private(set) var isDesktopExperienceActive = false
 
     private let store: any ThemeStoring
     private let runtime: any DesktopIntegrating
@@ -105,7 +106,12 @@ final class EditorModel: ObservableObject {
 
     static func live() -> EditorModel {
         do {
-            return EditorModel(store: try ThemeStore())
+            let store = try ThemeStore()
+            let runtime = DesktopRuntimeController.makeForApplication(themeStore: store)
+            let model = EditorModel(store: store, runtime: runtime)
+            runtime.layoutSink = model
+            model.finishLaunchingDesktopExperience()
+            return model
         } catch {
             let model = EditorModel(store: InMemoryThemeStore(themes: []))
             model.notice = EditorNotice(
@@ -113,6 +119,16 @@ final class EditorModel: ObservableObject {
                 message: error.localizedDescription
             )
             return model
+        }
+    }
+
+    /// Reopens widget windows from the last session. A bad theme or missing file only sets a notice.
+    func finishLaunchingDesktopExperience() {
+        guard let report = runtime.recoverPersistedExperience() else { return }
+        isDesktopExperienceActive = runtime.isExperienceActive
+        statusText = report.title
+        if !report.applied {
+            notice = EditorNotice(title: report.title, message: report.message)
         }
     }
 
@@ -301,6 +317,11 @@ final class EditorModel: ObservableObject {
             item.id = UUID()
             return item
         }
+        copy.settings.launcherFavorites = copy.settings.launcherFavorites.map { item in
+            var item = item
+            item.id = UUID()
+            return item
+        }
         mutate(token: "duplicate-\(copy.id.uuidString)", continuous: false) { theme in
             theme.components.append(copy)
         }
@@ -421,6 +442,198 @@ final class EditorModel: ObservableObject {
                 DockItem(id: UUID(), title: "App", symbolName: "app.fill")
             )
         }
+    }
+
+    func chooseDockApplication() {
+        guard let componentID = selectedComponentID else { return }
+        guard let picked = DockAppPicker.chooseApplication() else { return }
+        do {
+            try ThemeValidation.requireIdentifier(
+                picked.bundleIdentifier,
+                field: "Bundle identifier",
+                limit: ThemeLimits.maxBundleIdentifierLength
+            )
+        } catch {
+            present(error)
+            return
+        }
+        mutate(token: "dock-pick-\(UUID().uuidString)", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.dockItems.append(
+                DockItem(
+                    id: UUID(),
+                    title: String(picked.title.prefix(ThemeLimits.maxNameLength)),
+                    symbolName: "app.fill",
+                    bundleIdentifier: picked.bundleIdentifier,
+                    pinned: true
+                )
+            )
+            self.refitDock(at: index, in: &theme, realign: false)
+        }
+    }
+
+    func setDockItemPinned(_ itemID: UUID, pinned: Bool) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "dock-pin-\(itemID.uuidString)", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }),
+                  let itemIndex = theme.components[index].settings.dockItems.firstIndex(where: { $0.id == itemID })
+            else { return }
+            theme.components[index].settings.dockItems[itemIndex].pinned = pinned
+            self.refitDock(at: index, in: &theme, realign: false)
+        }
+    }
+
+    func setDockIconSize(_ value: Double) {
+        updateDockMetrics { settings in
+            settings.dockIconSize = min(max(value, DockLayout.iconSizeRange.lowerBound), DockLayout.iconSizeRange.upperBound)
+        }
+    }
+
+    func setDockSpacing(_ value: Double) {
+        updateDockMetrics { settings in
+            settings.dockSpacing = min(max(value, DockLayout.spacingRange.lowerBound), DockLayout.spacingRange.upperBound)
+        }
+    }
+
+    func setDockPadding(_ value: Double) {
+        updateDockMetrics { settings in
+            settings.dockPadding = min(max(value, DockLayout.paddingRange.lowerBound), DockLayout.paddingRange.upperBound)
+        }
+    }
+
+    func setDockEdge(_ edge: DockEdge) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "dock-edge", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.dockEdge = edge
+            self.refitDock(at: index, in: &theme, realign: true)
+        }
+    }
+
+    func setDockAlignment(_ alignment: DockAlignment) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "dock-align", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.dockAlignment = alignment
+            self.refitDock(at: index, in: &theme, realign: true)
+        }
+    }
+
+    func setDockLaunchAtLogin(_ enabled: Bool) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "dock-login", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.launchAtLogin = enabled
+        }
+    }
+
+    func chooseLauncherFavorite() {
+        guard let componentID = selectedComponentID else { return }
+        guard let picked = DockAppPicker.chooseApplication() else { return }
+        do {
+            try ThemeValidation.requireIdentifier(picked.bundleIdentifier, field: "Bundle identifier", limit: ThemeLimits.maxBundleIdentifierLength)
+        } catch {
+            present(error)
+            return
+        }
+        mutate(token: "launcher-pin-\(UUID().uuidString)", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.launcherFavorites.append(
+                LauncherFavorite(
+                    id: UUID(),
+                    title: String(picked.title.prefix(ThemeLimits.maxNameLength)),
+                    bundleIdentifier: picked.bundleIdentifier,
+                    groupName: "Pinned"
+                )
+            )
+        }
+    }
+
+    func removeLauncherFavorite(_ favoriteID: UUID) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "launcher-unpin-\(favoriteID.uuidString)", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.launcherFavorites.removeAll { $0.id == favoriteID }
+        }
+    }
+
+    func launcherFavoriteBinding(_ favoriteID: UUID, keyPath: WritableKeyPath<LauncherFavorite, String>) -> Binding<String> {
+        Binding(
+            get: {
+                self.selectedComponent?.settings.launcherFavorites.first { $0.id == favoriteID }?[keyPath: keyPath] ?? ""
+            },
+            set: { newValue in
+                guard let componentID = self.selectedComponentID else { return }
+                self.mutate(token: "launcher-\(favoriteID.uuidString)", continuous: true) { theme in
+                    guard let componentIndex = theme.components.firstIndex(where: { $0.id == componentID }),
+                          let itemIndex = theme.components[componentIndex].settings.launcherFavorites.firstIndex(where: { $0.id == favoriteID })
+                    else { return }
+                    theme.components[componentIndex].settings.launcherFavorites[itemIndex][keyPath: keyPath] = newValue
+                }
+            }
+        )
+    }
+
+    func setLauncherSpacing(_ value: Double) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "launcher-spacing", continuous: true) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.launcherSpacing = min(max(value, 0), ThemeLimits.maxSpacing)
+        }
+    }
+
+    func setLauncherPlacement(_ placement: LauncherPlacement) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "launcher-placement", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.launcherPlacement = placement
+            theme.components[index].frame = LauncherLayout.fitted(
+                theme.components[index].frame,
+                placement: placement,
+                canvas: theme.canvas
+            )
+        }
+    }
+
+    func setLauncherShortcutKey(_ key: String) {
+        guard let componentID = selectedComponentID else { return }
+        let normalized = key.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard LauncherShortcut.carbonKeyCode(for: normalized) != nil else { return }
+        mutate(token: "launcher-key", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            theme.components[index].settings.launcherShortcutKey = normalized
+        }
+    }
+
+    func setLauncherModifier(_ name: String, enabled: Bool) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "launcher-modifier-\(name)", continuous: false) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            var modifiers = theme.components[index].settings.launcherShortcutModifiers
+            modifiers.removeAll { $0 == name }
+            if enabled {
+                modifiers.append(name)
+            }
+            theme.components[index].settings.launcherShortcutModifiers = modifiers
+        }
+    }
+
+    private func updateDockMetrics(_ change: (inout ComponentSettings) -> Void) {
+        guard let componentID = selectedComponentID else { return }
+        mutate(token: "dock-metrics", continuous: true) { theme in
+            guard let index = theme.components.firstIndex(where: { $0.id == componentID }) else { return }
+            change(&theme.components[index].settings)
+            self.refitDock(at: index, in: &theme, realign: false)
+        }
+    }
+
+    private func refitDock(at index: Int, in theme: inout Theme, realign: Bool) {
+        let component = theme.components[index]
+        var frame = DockLayout.fittedFrame(component.frame, settings: component.settings, canvas: theme.canvas)
+        if realign {
+            frame = DockLayout.aligned(frame, alignment: component.settings.dockAlignment, edge: component.settings.dockEdge, canvas: theme.canvas)
+        }
+        theme.components[index].frame = frame
     }
 
     func deleteDockItem(_ itemID: UUID) {
@@ -640,9 +853,82 @@ final class EditorModel: ObservableObject {
 
     func applySelectedTheme() {
         let report = runtime.apply(theme: selectedTheme)
+        record(report)
+    }
+
+    func stopDesktopExperience() {
+        record(runtime.stopExperience())
+    }
+
+    func toggleLauncher() {
+        runtime.toggleLauncher()
+        editRevision += 1
+    }
+
+    func restoreDefaultDesktop() {
+        record(runtime.restoreDefaultExperience())
+    }
+
+    private func record(_ report: DesktopApplyReport) {
         lastApplyReport = report
+        isDesktopExperienceActive = runtime.isExperienceActive
         notice = EditorNotice(title: report.title, message: report.message)
         statusText = report.title
+        editRevision += 1
+    }
+
+    func runtimeDidUpdateComponent(
+        themeID: UUID,
+        componentID: UUID,
+        frame: ComponentFrame?,
+        settings: ComponentSettings?
+    ) -> Bool {
+        guard let themeIndex = themes.firstIndex(where: { $0.id == themeID }),
+              let componentIndex = themes[themeIndex].components.firstIndex(where: { $0.id == componentID })
+        else { return false }
+        let previous = themes[themeIndex]
+        if let frame {
+            themes[themeIndex].components[componentIndex].frame = frame
+        }
+        if let settings {
+            themes[themeIndex].components[componentIndex].settings = settings
+        }
+        themes[themeIndex].updatedAt = Date()
+        do {
+            try store.save(themes[themeIndex])
+            savedSnapshots[themeID] = themes[themeIndex]
+            refreshDirtyFlag()
+            editRevision += 1
+            statusText = "Saved widget changes in “\(themes[themeIndex].name)”."
+            return true
+        } catch {
+            themes[themeIndex] = previous
+            present(error)
+            return false
+        }
+    }
+
+    func runtimeDidReplaceTheme(_ theme: Theme) -> Bool {
+        guard let themeIndex = themes.firstIndex(where: { $0.id == theme.id }) else { return false }
+        let previous = themes[themeIndex]
+        themes[themeIndex] = theme
+        do {
+            try store.save(theme)
+            savedSnapshots[theme.id] = theme
+            if selectedThemeID == theme.id {
+                undoStack.removeAll()
+                redoStack.removeAll()
+                coalesceToken = nil
+                selectedComponentID = nil
+            }
+            refreshDirtyFlag()
+            editRevision += 1
+            return true
+        } catch {
+            themes[themeIndex] = previous
+            present(error)
+            return false
+        }
     }
 
     func undo() {
@@ -767,6 +1053,11 @@ final class EditorModel: ObservableObject {
             var component = component
             component.id = UUID()
             component.settings.dockItems = component.settings.dockItems.map { item in
+                var item = item
+                item.id = UUID()
+                return item
+            }
+            component.settings.launcherFavorites = component.settings.launcherFavorites.map { item in
                 var item = item
                 item.id = UUID()
                 return item

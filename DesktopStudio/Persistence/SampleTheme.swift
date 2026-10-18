@@ -155,12 +155,12 @@ enum SampleTheme {
             settings: settings(
                 title: "Dock",
                 dockItems: [
-                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-000000000008")!, title: "Finder", symbolName: "folder"),
-                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-000000000009")!, title: "Safari", symbolName: "safari"),
-                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000A")!, title: "Mail", symbolName: "envelope"),
-                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000B")!, title: "Messages", symbolName: "message"),
-                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000C")!, title: "Music", symbolName: "music.note"),
-                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000D")!, title: "System Settings", symbolName: "gearshape")
+                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-000000000008")!, title: "Finder", symbolName: "folder", bundleIdentifier: "com.apple.finder"),
+                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-000000000009")!, title: "Safari", symbolName: "safari", bundleIdentifier: "com.apple.Safari"),
+                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000A")!, title: "Mail", symbolName: "envelope", bundleIdentifier: "com.apple.mail"),
+                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000B")!, title: "Messages", symbolName: "message", bundleIdentifier: "com.apple.MobileSMS"),
+                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000C")!, title: "Music", symbolName: "music.note", bundleIdentifier: "com.apple.Music"),
+                    DockItem(id: UUID(uuidString: "A1000000-0000-4000-8000-00000000000D")!, title: "System Settings", symbolName: "gearshape", bundleIdentifier: "com.apple.systempreferences")
                 ]
             )
         )

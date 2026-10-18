@@ -214,12 +214,12 @@
           "showsDate": false,
           "showsSeconds": false,
           "dockItems": [
-            { "id": "A1000000-0000-4000-8000-000000000008", "title": "Finder", "symbolName": "folder" },
-            { "id": "A1000000-0000-4000-8000-000000000009", "title": "Safari", "symbolName": "safari" },
-            { "id": "A1000000-0000-4000-8000-00000000000A", "title": "Mail", "symbolName": "envelope" },
-            { "id": "A1000000-0000-4000-8000-00000000000B", "title": "Messages", "symbolName": "message" },
-            { "id": "A1000000-0000-4000-8000-00000000000C", "title": "Music", "symbolName": "music.note" },
-            { "id": "A1000000-0000-4000-8000-00000000000D", "title": "System Settings", "symbolName": "gearshape" }
+            { "id": "A1000000-0000-4000-8000-000000000008", "title": "Finder", "symbolName": "folder", "bundleIdentifier": "com.apple.finder" },
+            { "id": "A1000000-0000-4000-8000-000000000009", "title": "Safari", "symbolName": "safari", "bundleIdentifier": "com.apple.Safari" },
+            { "id": "A1000000-0000-4000-8000-00000000000A", "title": "Mail", "symbolName": "envelope", "bundleIdentifier": "com.apple.mail" },
+            { "id": "A1000000-0000-4000-8000-00000000000B", "title": "Messages", "symbolName": "message", "bundleIdentifier": "com.apple.MobileSMS" },
+            { "id": "A1000000-0000-4000-8000-00000000000C", "title": "Music", "symbolName": "music.note", "bundleIdentifier": "com.apple.Music" },
+            { "id": "A1000000-0000-4000-8000-00000000000D", "title": "System Settings", "symbolName": "gearshape", "bundleIdentifier": "com.apple.systempreferences" }
           ]
         }
       }

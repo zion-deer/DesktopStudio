@@ -55,6 +55,21 @@
 		F2A200000000000000000012 /* GlobalStyleInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000011 /* GlobalStyleInspector.swift */; };
 		F2A200000000000000000014 /* ThemeGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000013 /* ThemeGalleryView.swift */; };
 		F2A200000000000000000016 /* ThemeSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A200000000000000000015 /* ThemeSystemTests.swift */; };
+		F3B100000000000000000001 /* CanvasScreenMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000001 /* CanvasScreenMapping.swift */; };
+		F3B100000000000000000002 /* DesktopExperienceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000002 /* DesktopExperienceSession.swift */; };
+		F3B100000000000000000003 /* DesktopRuntimeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000003 /* DesktopRuntimeController.swift */; };
+		F3B100000000000000000004 /* DesktopWidgetWindows.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000004 /* DesktopWidgetWindows.swift */; };
+		F3B100000000000000000005 /* DesktopWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000005 /* DesktopWidgets.swift */; };
+		F3B100000000000000000007 /* DesktopRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000007 /* DesktopRuntimeTests.swift */; };
+		F3B100000000000000000008 /* DockLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000008 /* DockLayout.swift */; };
+		F3B100000000000000000009 /* DockAppPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000009 /* DockAppPicker.swift */; };
+		F3B10000000000000000000A /* LoginItemRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A10000000000000000000A /* LoginItemRegistration.swift */; };
+		F3B10000000000000000000B /* DockConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A10000000000000000000B /* DockConfigurationTests.swift */; };
+		F3B10000000000000000000C /* LauncherCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A10000000000000000000C /* LauncherCatalog.swift */; };
+		F3B10000000000000000000D /* LauncherHotkey.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A10000000000000000000D /* LauncherHotkey.swift */; };
+		F3B10000000000000000000E /* LauncherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A10000000000000000000E /* LauncherView.swift */; };
+		F3B10000000000000000000F /* LauncherInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A10000000000000000000F /* LauncherInspector.swift */; };
+		F3B100000000000000000010 /* LauncherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A100000000000000000010 /* LauncherTests.swift */; };
 		F7CABE4A40B23F6964F06EAE /* ThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 364C73B40080F2CF6CD38CDB /* ThemeStore.swift */; };
 		F7DF82735AB32C5890405AD0 /* DesktopIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38C24DCD8CB113D2354B33C7 /* DesktopIntegration.swift */; };
 		F81D430A5EB8F35E4481C802 /* DesktopComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7187AB7CFF17DE35DBEB6D /* DesktopComponent.swift */; };
@@ -122,6 +137,21 @@
 		F2A200000000000000000011 /* GlobalStyleInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalStyleInspector.swift; sourceTree = "<group>"; };
 		F2A200000000000000000013 /* ThemeGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeGalleryView.swift; sourceTree = "<group>"; };
 		F2A200000000000000000015 /* ThemeSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSystemTests.swift; sourceTree = "<group>"; };
+		F3A100000000000000000001 /* CanvasScreenMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasScreenMapping.swift; sourceTree = "<group>"; };
+		F3A100000000000000000002 /* DesktopExperienceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopExperienceSession.swift; sourceTree = "<group>"; };
+		F3A100000000000000000003 /* DesktopRuntimeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopRuntimeController.swift; sourceTree = "<group>"; };
+		F3A100000000000000000004 /* DesktopWidgetWindows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopWidgetWindows.swift; sourceTree = "<group>"; };
+		F3A100000000000000000005 /* DesktopWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopWidgets.swift; sourceTree = "<group>"; };
+		F3A100000000000000000007 /* DesktopRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopRuntimeTests.swift; sourceTree = "<group>"; };
+		F3A100000000000000000008 /* DockLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockLayout.swift; sourceTree = "<group>"; };
+		F3A100000000000000000009 /* DockAppPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockAppPicker.swift; sourceTree = "<group>"; };
+		F3A10000000000000000000A /* LoginItemRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemRegistration.swift; sourceTree = "<group>"; };
+		F3A10000000000000000000B /* DockConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockConfigurationTests.swift; sourceTree = "<group>"; };
+		F3A10000000000000000000C /* LauncherCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherCatalog.swift; sourceTree = "<group>"; };
+		F3A10000000000000000000D /* LauncherHotkey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherHotkey.swift; sourceTree = "<group>"; };
+		F3A10000000000000000000E /* LauncherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherView.swift; sourceTree = "<group>"; };
+		F3A10000000000000000000F /* LauncherInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherInspector.swift; sourceTree = "<group>"; };
+		F3A100000000000000000010 /* LauncherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LauncherTests.swift; sourceTree = "<group>"; };
 		F30F872F53AFF4399385A64C /* ComponentAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentAppearance.swift; sourceTree = "<group>"; };
 		F5D6E0CD527BF545D01A7504 /* ThemeCodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeCodingTests.swift; sourceTree = "<group>"; };
 		FDFD179F81E4C0284597BE4B /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
@@ -152,6 +182,7 @@
 				F2A20000000000000000000F /* AppearanceInspector.swift */,
 				BCDB4E7A2121599F35E6DB04 /* DockItemsEditor.swift */,
 				F2A200000000000000000011 /* GlobalStyleInspector.swift */,
+				F3A10000000000000000000F /* LauncherInspector.swift */,
 				3621352A119DC711502F6297 /* InspectorControls.swift */,
 				D6AA3CF46166C63D2D3E3CF2 /* PropertiesInspectorView.swift */,
 			);
@@ -200,6 +231,9 @@
 				F2A200000000000000000015 /* ThemeSystemTests.swift */,
 				F5D6E0CD527BF545D01A7504 /* ThemeCodingTests.swift */,
 				CD1ED65F0897123A3586F2BC /* ThemeStoreTests.swift */,
+				F3A100000000000000000007 /* DesktopRuntimeTests.swift */,
+				F3A10000000000000000000B /* DockConfigurationTests.swift */,
+				F3A100000000000000000010 /* LauncherTests.swift */,
 			);
 			path = DesktopStudioTests;
 			sourceTree = "<group>";
@@ -315,6 +349,17 @@
 			isa = PBXGroup;
 			children = (
 				38C24DCD8CB113D2354B33C7 /* DesktopIntegration.swift */,
+				F3A100000000000000000001 /* CanvasScreenMapping.swift */,
+				F3A100000000000000000002 /* DesktopExperienceSession.swift */,
+				F3A100000000000000000003 /* DesktopRuntimeController.swift */,
+				F3A100000000000000000004 /* DesktopWidgetWindows.swift */,
+				F3A100000000000000000005 /* DesktopWidgets.swift */,
+				F3A100000000000000000008 /* DockLayout.swift */,
+				F3A100000000000000000009 /* DockAppPicker.swift */,
+				F3A10000000000000000000A /* LoginItemRegistration.swift */,
+				F3A10000000000000000000C /* LauncherCatalog.swift */,
+				F3A10000000000000000000D /* LauncherHotkey.swift */,
+				F3A10000000000000000000E /* LauncherView.swift */,
 			);
 			path = Runtime;
 			sourceTree = "<group>";
@@ -432,6 +477,9 @@
 				F2A200000000000000000016 /* ThemeSystemTests.swift in Sources */,
 				3AC8926972AD8948B038DA2C /* ThemeCodingTests.swift in Sources */,
 				59E17B9A0F17F126B7879003 /* ThemeStoreTests.swift in Sources */,
+				F3B100000000000000000007 /* DesktopRuntimeTests.swift in Sources */,
+				F3B10000000000000000000B /* DockConfigurationTests.swift in Sources */,
+				F3B100000000000000000010 /* LauncherTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,6 +530,18 @@
 				8389B3383F09B0E9930E23FE /* ThemeResources.swift in Sources */,
 				F7CABE4A40B23F6964F06EAE /* ThemeStore.swift in Sources */,
 				F7DF82735AB32C5890405AD0 /* DesktopIntegration.swift in Sources */,
+				F3B100000000000000000001 /* CanvasScreenMapping.swift in Sources */,
+				F3B100000000000000000002 /* DesktopExperienceSession.swift in Sources */,
+				F3B100000000000000000003 /* DesktopRuntimeController.swift in Sources */,
+				F3B100000000000000000004 /* DesktopWidgetWindows.swift in Sources */,
+				F3B100000000000000000005 /* DesktopWidgets.swift in Sources */,
+				F3B100000000000000000008 /* DockLayout.swift in Sources */,
+				F3B100000000000000000009 /* DockAppPicker.swift in Sources */,
+				F3B10000000000000000000A /* LoginItemRegistration.swift in Sources */,
+				F3B10000000000000000000C /* LauncherCatalog.swift in Sources */,
+				F3B10000000000000000000D /* LauncherHotkey.swift in Sources */,
+				F3B10000000000000000000E /* LauncherView.swift in Sources */,
+				F3B10000000000000000000F /* LauncherInspector.swift in Sources */,
 				A68121664E7D5283B993531F /* StudioLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

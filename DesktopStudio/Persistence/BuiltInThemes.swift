@@ -54,7 +54,11 @@ enum BuiltInTheme: String, CaseIterable, Identifiable {
                 component(id: "C1000000-0000-4000-8000-000000000012", type: .appShortcut, name: "Finder", frame: ComponentFrame(x: 48, y: 250, width: 220, height: 88, zIndex: 2), settings: settings(title: "Finder", symbolName: "folder", bundleIdentifier: "com.apple.finder")),
                 component(id: "C1000000-0000-4000-8000-000000000013", type: .appShortcut, name: "Safari", frame: ComponentFrame(x: 284, y: 250, width: 220, height: 88, zIndex: 2), settings: settings(title: "Safari", symbolName: "safari", bundleIdentifier: "com.apple.Safari")),
                 component(id: "C1000000-0000-4000-8000-000000000014", type: .notes, name: "Notes", frame: ComponentFrame(x: 980, y: 230, width: 400, height: 500, zIndex: 3), settings: settings(title: "Scratch pad", body: "A note sits beside the tiles.")),
-                component(id: "C1000000-0000-4000-8000-000000000015", type: .dock, name: "Taskbar", frame: ComponentFrame(x: 0, y: 844, width: 1440, height: 56, zIndex: 4), settings: settings(title: "Taskbar", dockItems: dockItems(prefix: "C1000000-0000-4000-8000-00000000002")))
+                component(id: "C1000000-0000-4000-8000-000000000015", type: .dock, name: "Taskbar", frame: ComponentFrame(x: 0, y: 844, width: 1440, height: 56, zIndex: 4), settings: settings(title: "Taskbar", dockItems: dockItems(prefix: "C1000000-0000-4000-8000-00000000002"))),
+                component(id: "C1000000-0000-4000-8000-000000000016", type: .launcher, name: "Start", frame: ComponentFrame(x: 48, y: 160, width: 420, height: 520, zIndex: 6), settings: settings(title: "Start", launcherFavorites: [
+                    LauncherFavorite(id: UUID(uuidString: "C1000000-0000-4000-8000-000000000030")!, title: "Finder", bundleIdentifier: "com.apple.finder", groupName: "Everyday"),
+                    LauncherFavorite(id: UUID(uuidString: "C1000000-0000-4000-8000-000000000031")!, title: "Safari", bundleIdentifier: "com.apple.Safari", groupName: "Everyday")
+                ]))
             ]
         )
     }
@@ -142,7 +146,8 @@ enum BuiltInTheme: String, CaseIterable, Identifiable {
         symbolName: String = "",
         bundleIdentifier: String = "",
         showsDate: Bool = false,
-        dockItems: [DockItem] = []
+        dockItems: [DockItem] = [],
+        launcherFavorites: [LauncherFavorite] = []
     ) -> ComponentSettings {
         ComponentSettings(
             title: title,
@@ -152,16 +157,17 @@ enum BuiltInTheme: String, CaseIterable, Identifiable {
             timeFormat: .system,
             showsDate: showsDate,
             showsSeconds: false,
-            dockItems: dockItems
+            dockItems: dockItems,
+            launcherFavorites: launcherFavorites
         )
     }
 
     private static func dockItems(prefix: String) -> [DockItem] {
         [
-            DockItem(id: UUID(uuidString: prefix + "0")!, title: "Finder", symbolName: "folder"),
-            DockItem(id: UUID(uuidString: prefix + "1")!, title: "Safari", symbolName: "safari"),
-            DockItem(id: UUID(uuidString: prefix + "2")!, title: "Mail", symbolName: "envelope"),
-            DockItem(id: UUID(uuidString: prefix + "3")!, title: "Music", symbolName: "music.note")
+            DockItem(id: UUID(uuidString: prefix + "0")!, title: "Finder", symbolName: "folder", bundleIdentifier: "com.apple.finder"),
+            DockItem(id: UUID(uuidString: prefix + "1")!, title: "Safari", symbolName: "safari", bundleIdentifier: "com.apple.Safari"),
+            DockItem(id: UUID(uuidString: prefix + "2")!, title: "Mail", symbolName: "envelope", bundleIdentifier: "com.apple.mail"),
+            DockItem(id: UUID(uuidString: prefix + "3")!, title: "Music", symbolName: "music.note", bundleIdentifier: "com.apple.Music")
         ]
     }
 }

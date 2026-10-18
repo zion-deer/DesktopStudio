@@ -51,7 +51,7 @@ struct PropertiesInspectorView: View {
 
     private var desktopForm: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Themes are saved as JSON on this Mac. Applying one does not change the desktop in this version.")
+            Text("Themes are saved as JSON on this Mac. Apply opens widget windows, including a custom dock that does not change the system Dock.")
                 .font(.callout)
                 .foregroundStyle(StudioPalette.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -209,19 +209,15 @@ struct PropertiesInspectorView: View {
                         .accessibilityLabel("Bundle identifier")
                 }
                 symbolField
-                Text("The shortcut is a mockup. It does not launch the app.")
+                Text("Apply opens this shortcut with NSWorkspace when the app is installed.")
                     .font(.caption)
                     .foregroundStyle(StudioPalette.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         case .dock:
             DockItemsEditor()
-            InspectorSection(title: "Symbol size") {
-                Text("Icon size follows the font size in Appearance.")
-                    .font(.caption)
-                    .foregroundStyle(StudioPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+        case .launcher:
+            LauncherInspector()
         }
     }
 

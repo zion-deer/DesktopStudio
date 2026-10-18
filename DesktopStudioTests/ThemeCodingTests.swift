@@ -17,7 +17,7 @@ final class ThemeCodingTests: XCTestCase {
         XCTAssertEqual(theme.canvas.height, 900)
         XCTAssertEqual(theme.canvas.style, .gradient)
         XCTAssertEqual(theme.components.count, 7)
-        XCTAssertEqual(Set(theme.components.map(\.type)), Set(ComponentType.allCases))
+        XCTAssertEqual(Set(theme.components.map(\.type)), Set([ComponentType.clock, .text, .appShortcut, .dock, .notes]))
     }
 
     func testBundledSampleMatchesFactory() throws {

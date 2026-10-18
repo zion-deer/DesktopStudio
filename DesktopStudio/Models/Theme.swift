@@ -115,7 +115,25 @@ struct Theme: Codable, Hashable, Identifiable {
             }
             try ThemeValidation.requireText(item.title, field: "\(name) dock item", limit: ThemeLimits.maxNameLength, allowNewlines: false)
             try ThemeValidation.requireIdentifier(item.symbolName, field: "\(name) dock symbol", limit: ThemeLimits.maxSymbolLength)
+            try ThemeValidation.requireIdentifier(item.bundleIdentifier, field: "\(name) dock bundle identifier", limit: ThemeLimits.maxBundleIdentifierLength)
         }
+        if settings.launcherFavorites.count > ThemeLimits.maxDockItems {
+            throw ThemeCodingError.invalidTheme("\(name) can contain at most \(ThemeLimits.maxDockItems) launcher favorites.")
+        }
+        var favoriteIDs = Set<UUID>()
+        for favorite in settings.launcherFavorites {
+            if !favoriteIDs.insert(favorite.id).inserted {
+                throw ThemeCodingError.invalidTheme("\(name) has two launcher favorites with the same id.")
+            }
+            try ThemeValidation.requireText(favorite.title, field: "\(name) launcher favorite", limit: ThemeLimits.maxNameLength, allowNewlines: false)
+            try ThemeValidation.requireIdentifier(favorite.bundleIdentifier, field: "\(name) launcher bundle identifier", limit: ThemeLimits.maxBundleIdentifierLength)
+            try ThemeValidation.requireText(favorite.groupName, field: "\(name) launcher group", limit: ThemeLimits.maxNameLength, allowNewlines: false)
+        }
+        try ThemeValidation.requireRange(settings.launcherSpacing, 0...ThemeLimits.maxSpacing, "\(name) launcher spacing")
+        try LauncherShortcut.validate(key: settings.launcherShortcutKey, modifiers: settings.launcherShortcutModifiers, field: name)
+        try ThemeValidation.requireRange(settings.dockIconSize, DockLayout.iconSizeRange, "\(name) icon size")
+        try ThemeValidation.requireRange(settings.dockSpacing, DockLayout.spacingRange, "\(name) icon spacing")
+        try ThemeValidation.requireRange(settings.dockPadding, DockLayout.paddingRange, "\(name) dock padding")
     }
 
     private func validate(_ overrides: AppearanceOverrides, named name: String) throws {
